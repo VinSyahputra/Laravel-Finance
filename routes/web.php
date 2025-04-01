@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Auth;
@@ -25,16 +26,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-
-    // Route::get('/transactions', function () {
-    //     return view('contents.transaction.index');
-    // })->name('transaction');
-
-    Route::get('/categories', function () {
-        return view('contents.category.index');
-    })->name('category');
 });
 
+Route::prefix('categories')
+    ->middleware(['auth', 'verified'])
+    ->controller(CategoryController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+    });
 Route::prefix('transactions')
     ->middleware(['auth', 'verified'])
     ->controller(TransactionController::class)

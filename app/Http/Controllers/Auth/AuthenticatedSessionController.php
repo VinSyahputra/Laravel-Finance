@@ -25,12 +25,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request)
     {
-        $request->authenticate();
+        $request->authenticate(); // Validate user credentials
 
         $user = $request->user();
 
-        $request->session()->regenerate();
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Generate Sanctum token
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        // Store token in session
+        session(['auth_token' => $token]);
+
+        return redirect()->intended(route('dashboard'));
     }
 
     /**
@@ -38,12 +43,17 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $user = $request->user();
+
+        if ($user && $request->bearerToken()) {
+            $user->currentAccessToken()?->delete(); // Use optional chaining
+        }
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
 
         $request->session()->regenerateToken();
-
+        $user->tokens()->delete(); // Revoke all tokens
         return redirect('/');
     }
 }

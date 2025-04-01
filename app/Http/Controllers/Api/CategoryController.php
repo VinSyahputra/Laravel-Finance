@@ -18,7 +18,9 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-
+        // if (!$request->user()->can('view categories')) {
+        //     return response()->json(['error' => 'Forbidden'], 403);
+        // }
         $allowedSortFields = ['name', 'created_at', 'updated_at'];
 
         $categories = Category::when($request->input('search'), function ($query) use ($request) {

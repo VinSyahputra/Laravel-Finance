@@ -112,7 +112,7 @@ class TransactionController extends Controller
     {
         try {
             // Find the transaction by its ID
-            $transaction = Transaction::where('id', $transactionId)->first();
+            $transaction = Transaction::find($transactionId);
 
             if (!$transaction) {
                 return response()->json([
@@ -123,29 +123,32 @@ class TransactionController extends Controller
                 ], Response::HTTP_NOT_FOUND);
             }
 
+            // Prepare request data before validation
+            $input = $request->all();
+            if (isset($input['amount'])) {
+                $input['amount'] = (int) str_replace('.', '', $input['amount']);
+            }
+
             // Perform validation
-            $validated = Validator::make($request->all(), TransactionValidation::update());
+            $validated = Validator::make($input, TransactionValidation::update());
 
             if ($validated->fails()) {
-                // Return all validation errors, not just the first one
                 return response()->json([
                     'message' => 'Validation failed.',
                     'status' => 'FAILED',
-                    'errors' => $validated->errors()->first(),
+                    'errors' => $validated->errors(), // Return all validation errors
                 ], Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             // Update the transaction with validated data
-            $transaction->update($validated->validated()); // Use validated data, not the raw request
+            $transaction->update($validated->validated());
 
-            // Return success response
             return response()->json([
                 'data' => $transaction,
                 'message' => 'Data updated successfully',
-                'status' => Response::HTTP_OK // Changed to HTTP_OK for success
+                'status' => Response::HTTP_OK
             ], Response::HTTP_OK);
         } catch (\Throwable $th) {
-            // Return internal server error on exceptions
             return response()->json([
                 "code" => 500,
                 "status" => "FAILED",
@@ -154,6 +157,7 @@ class TransactionController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
 
     /**

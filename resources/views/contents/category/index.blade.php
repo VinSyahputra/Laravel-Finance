@@ -19,15 +19,17 @@
                         <h3 class="card-title">Category List</h3>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex">
-                            <button type="button"
-                                class="btn btn-primary btn-add-category mx-auto col-12 col-sm-8 col-md-5 mb-3"
-                                data-bs-toggle="modal" data-bs-target="#categoryModal">
-                                <span>
-                                    <i class="ti ti-new-section"></i> add category
-                                </span>
-                            </button>
-                        </div>
+                        @can('create categories')
+                            <div class="d-flex">
+                                <button type="button"
+                                    class="btn btn-primary btn-add-category mx-auto col-12 col-sm-8 col-md-5 mb-3"
+                                    data-bs-toggle="modal" data-bs-target="#categoryModal">
+                                    <span>
+                                        <i class="ti ti-new-section"></i> add category
+                                    </span>
+                                </button>
+                            </div>
+                        @endcan
                         <div class="d-flex mb-2">
                             <input type="search" class="form-control me-2" id="searchCategory"
                                 placeholder="Search categories...">
@@ -115,86 +117,85 @@
             actionSearch();
             btnActionSave();
         });
+
         const fetchCategories = (url = 'api/categories', searchQuery = '') => {
-            // Append search query to the URL
             if (searchQuery) {
                 const querySymbol = url.includes('?') ? '&' : '?';
                 url += `${querySymbol}search=${searchQuery}`;
             }
+            const userPermissions = @json(auth()->user()->getPermissionsViaRoles()->pluck('name'));
+
+            // console.log(`User Permissions:`, userPermissions);
 
             ajaxRequest(url)
                 .then(response => {
-                    // Calculate the starting index based on the current page
                     const meta = response.meta;
                     const startIndex = (meta.current_page - 1) * meta.per_page;
 
-                    // Populate table rows
                     let htmlContent = '';
                     response.data.forEach((element, index) => {
-                        htmlContent += `
-                        <tr>    
-                          <td>${startIndex + index + 1}</td> <!-- Adjusted index -->
-                          <td>${element?.name}</td>
-                          <td>
-                            <div class="btn-group" role="group">
-                              <button type="button" class="btn btn-outline-warning btn-update-category btn-sm" data-id="${element?.id}" data-name="${element?.name}">
+                        let editButton = '';
+                        let deleteButton = '';
+                        if (userPermissions.includes('update categories')) {
+                            editButton = `
+                            <button type="button" class="btn btn-outline-warning btn-update-category btn-sm" 
+                                    data-id="${element.id}" data-name="${element.name}">
                                 <i class="ti ti-edit"></i>
-                              </button>
-                              <button type="button" class="btn btn-outline-danger btn-delete-category btn-sm" data-id="${element?.id}">
+                            </button>`;
+                        }
+                        if (userPermissions.includes('delete categories')) {
+                            deleteButton = `
+                            <button type="button" class="btn btn-outline-danger btn-delete-category btn-sm" data-id="${element.id}">
                                 <i class="ti ti-trash"></i>
-                              </button>
-                            </div>
-                          </td>
+                            </button>`;
+                        }
 
-                        </tr>
-                      `;
+                        htmlContent += `
+                    <tr>    
+                        <td>${startIndex + index + 1}</td>
+                        <td>${element?.name}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                ${editButton}
+                                ${deleteButton}
+                            </div>
+                        </td>
+                    </tr>`;
                     });
+
                     $('#tbodyCategory').html(htmlContent);
 
-
-                    $('.btn-delete-category').each(function() {
-                        $(this).off('click').on('click', function(e) {
-                            e.preventDefault();
-
-                            const categoryId = $(this).data('id');
-
-
-
-                            $('#deleteModal').modal('show');
-
-                            deleteCategory({
-                                category_id: categoryId
-                            })
+                    // Delete button click handler
+                    $('.btn-delete-category').off('click').on('click', function(e) {
+                        e.preventDefault();
+                        const categoryId = $(this).data('id');
+                        $('#deleteModal').modal('show');
+                        deleteCategory({
+                            category_id: categoryId
                         });
                     });
 
-                    $('.btn-update-category').each(function() {
-                        $(this).off('click').on('click', function(e) {
-                            e.preventDefault();
+                    // Edit button click handler
+                    $('.btn-update-category').off('click').on('click', function(e) {
+                        e.preventDefault();
+                        const categoryId = $(this).data('id');
+                        const categoryName = $(this).data('name');
 
-                            const categoryId = $(this).data('id');
-                            const categoryName = $(this).data('name');
+                        $('#formCategory input[name="id"]').val(categoryId);
+                        $('#formCategory input[name="name"]').val(categoryName);
 
-                            $('#formCategory input[name="id"]').val(categoryId);
-                            $('#formCategory input[name="name"]').val(categoryName);
-
-                            $('#categoryModal').modal('show');
-                        });
+                        $('#categoryModal').modal('show');
                     });
 
-
-                    // Handle pagination links
-                    const links = meta.links; // Use the updated meta.links for pagination
-
+                    // Pagination
                     let paginationHtml = '';
-                    links.forEach(link => {
+                    meta.links.forEach(link => {
                         paginationHtml += `
-                          <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
-                              <a class="page-link" href="#" data-url="${link.url}" ${!link.url ? 'tabindex="-1"' : ''}>
-                                  ${link.label}
-                              </a>
-                          </li>
-                      `;
+                        <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
+                            <a class="page-link" href="#" data-url="${link.url}" ${!link.url ? 'tabindex="-1"' : ''}>
+                                ${link.label}
+                            </a>
+                        </li>`;
                     });
 
                     $('#paginationLinks').html(paginationHtml);
@@ -204,13 +205,14 @@
                 });
         };
 
+
         const actionResetModal = () => {
             $('#categoryModal').on('show.bs.modal', function(e) {
-                const triggerButton = $(e.relatedTarget); // The button that triggered the modal
+                const triggerButton = $(e.relatedTarget);
                 if (triggerButton.hasClass('btn-add-category')) {
-                    // Clear the form if the modal is opened for adding a new category
-                    $('#formCategory')[0].reset(); // Reset the form fields
-                    $('#formCategory input[name="id"]').val(''); // Clear the hidden ID field
+
+                    $('#formCategory')[0].reset();
+                    $('#formCategory input[name="id"]').val('');
                 }
 
             });
@@ -223,63 +225,74 @@
         const btnActionSave = () => {
             $('#btnSaveCategory').off().on('click', function(e) {
                 e.preventDefault();
-
+                const authToken = "{{ session('auth_token') }}";
                 let formData = new FormData($('#formCategory')[0]);
-                let postData = {};
-                formData.forEach(function(value, key) {
-                    postData[key] = value;
-                });
 
-                if (!postData.id) {
-                    console.log('create');
-                    // Create new category
-                    ajaxRequest('/api/categories', 'POST', postData)
-                        .then(response => {
-                            if (response.status) {
-                                fetchCategories();
-                                $('#formCategory')[0].reset();
-                                $('#categoryModal').modal('hide');
-                                showToast('Category created successfully!', 'success');
-                            }
-                        })
-                        .catch(error => {
-                            showToast(error.response.errors, 'danger');
-                        });
-                } else {
-                    console.log('update');
-                    // Update existing category
-                    ajaxRequest(`/api/categories/${postData.id}`, 'PUT', postData)
-                        .then(response => {
-                            if (response.status) {
-                                fetchCategories();
-                                $('#formCategory')[0].reset();
-                                $('#categoryModal').modal('hide');
-                                showToast('Category updated successfully!', 'success');
-                            }
-                        })
-                        .catch(error => {
-                            showToast(error.response.errors, 'danger');
-                        });
+                let headers = {
+                    'Authorization': `Bearer ${authToken}`
+                };
+
+                let url = '/api/categories';
+                let method = 'POST';
+
+                if (formData.get('id')) {
+                    url = `/api/categories/${formData.get('id')}`;
+                    method = 'POST';
+                    formData.append('_method', 'PUT');
                 }
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: headers,
+                    success: function(response) {
+                        if (response.status) {
+                            fetchCategories();
+                            $('#formCategory')[0].reset();
+                            $('#categoryModal').modal('hide');
+                            showToast('Category saved successfully!', 'success');
+                        }
+                    },
+                    error: function(error) {
+                        showToast(error.responseJSON.errors.name[0],
+                            'danger');
+                    }
+                });
             });
-        }
+        };
+
 
         const deleteCategory = (props) => {
             $('#confirmDeleteBtn').off().on('click', function(e) {
-                ajaxRequest(`/api/categories/${props?.category_id}`, 'DELETE', props)
-                    .then(response => {
+                e.preventDefault();
+                const authToken = "{{ session('auth_token') }}";
+                let headers = {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                };
 
+                $.ajax({
+                    url: `/api/categories/${props?.category_id}`,
+                    type: 'DELETE',
+                    headers: headers,
+                    success: function(response) {
                         if (response.status) {
                             fetchCategories();
                             $('#deleteModal').modal('hide');
                             showToast('Category deleted successfully!', 'success');
                         }
-                    })
-                    .catch(error => {
-                        showToast(error.response.error, 'danger');
-                    });
-            })
-        }
+                    },
+                    error: function(error) {
+                        showToast(error.responseJSON?.error || 'Failed to delete category',
+                            'danger');
+                    }
+                });
+            });
+        };
+
         const actionSearch = () => {
             // Handle search input
             $('#searchCategory').on('keyup', function() {

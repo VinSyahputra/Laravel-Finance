@@ -7,26 +7,6 @@
     <div class="container-fluid">
         <!--  Row 1 -->
         <div class="row">
-            <div class="col-lg-8 d-flex align-items-strech">
-                <div class="card w-100">
-                    <div class="card-body">
-                        <div class="d-sm-flex d-block align-items-center justify-content-between mb-9">
-                            <div class="mb-3 mb-sm-0">
-                                <h5 class="card-title fw-semibold">Sales Overview</h5>
-                            </div>
-                            <div>
-                                <select class="form-select">
-                                    <option value="1">March 2023</option>
-                                    <option value="2">April 2023</option>
-                                    <option value="3">May 2023</option>
-                                    <option value="4">June 2023</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="chart"></div>
-                    </div>
-                </div>
-            </div>
             <div class="col-lg-4">
                 <div class="row">
                     <div class="col-lg-12">
@@ -34,34 +14,8 @@
                         <div class="card overflow-hidden">
                             <div class="card-body p-4">
                                 <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
-                                <div class="row align-items-center">
-                                    <div class="col-8">
-                                        <h4 class="fw-semibold mb-3">$36,358</h4>
-                                        <div class="d-flex align-items-center mb-3">
-                                            <span
-                                                class="me-1 rounded-circle bg-light-success round-20 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-arrow-up-left text-success"></i>
-                                            </span>
-                                            <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                                            <p class="fs-3 mb-0">last year</p>
-                                        </div>
-                                        <div class="d-flex align-items-center">
-                                            <div class="me-4">
-                                                <span class="round-8 bg-primary rounded-circle me-2 d-inline-block"></span>
-                                                <span class="fs-2">2023</span>
-                                            </div>
-                                            <div>
-                                                <span
-                                                    class="round-8 bg-light-primary rounded-circle me-2 d-inline-block"></span>
-                                                <span class="fs-2">2023</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="d-flex justify-content-center">
-                                            <div id="breakup"></div>
-                                        </div>
-                                    </div>
+                                <div class="row align-items-center" id="card_container_yearly">
+
                                 </div>
                             </div>
                         </div>
@@ -174,8 +128,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -247,10 +200,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            getDataInYear();
             populateYearSelect();
             getCategories('filterCategory');
             getCategories('transaction_category');
             fetchTransactions();
+            btnActionSaveTransaction();
         });
 
 
@@ -320,6 +275,8 @@
                             e.preventDefault();
                             const transaction = JSON.parse(atob($(this).data('transaction')));
 
+                            $('#transactionModal').modal('show');
+
                             // Handle date formatting for the date field
                             if (transaction?.date) {
                                 const formattedDate = new Date(transaction.date).toISOString()
@@ -328,14 +285,14 @@
                             }
 
                             $('#formTransaction input[name="id"]').val(transaction?.id);
-                            $('#formTransaction input[name="description"]').val(transaction
+                            $(
+                                '#formTransaction input[name="description"]').val(transaction
                                 ?.description);
-                            $('#formTransaction input[name="amount"]').val(transaction?.amount);
+                            $('#formTransaction input[name="amount"]').val(
+                                transaction?.amount);
 
                             $('#formTransaction select[name="category"]').val(transaction
                                 ?.category_id).change();
-
-                            $('#transactionModal').modal('show');
                         });
                     });
 
@@ -401,6 +358,61 @@
             }
         }
 
+        function getDataInYear() {
+
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json' // Ensure Laravel returns JSON
+            };
+
+            let url = '/api/analytics/this-year';
+            let method = 'GET';
+
+            $.ajax({
+                url: url,
+                type: method,
+                headers: headers,
+                success: function(response) {
+                    let statusClass = 'secondary';
+                    let iconClass = 'ti ti-arrows-left-right text-secondary'; // Default neutral icon
+                    let prefix = '';
+
+                    if (response?.data?.status === 'up') {
+                        statusClass = 'success';
+                        iconClass = 'ti ti-arrow-up-left text-success';
+                        prefix = '+';
+                    } else if (response?.data?.status === 'down') {
+                        statusClass = 'danger';
+                        iconClass = 'ti ti-arrow-down-right text-danger';
+                        prefix = '';
+                    }
+
+                    const totalAmount = Number(response?.data?.total_amount) || 0;
+                    const formattedAmount = totalAmount.toLocaleString('id-ID');
+
+                    let htmlContent = `
+                        <div class="col-8">
+                            <h4 class="fw-semibold mb-3">RP. ${formattedAmount}</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="me-1 rounded-circle bg-light-${statusClass} round-20 d-flex align-items-center justify-content-center">
+                                    <i class="${iconClass}"></i>
+                                </span>
+                                <p class="text-dark me-1 fs-3 mb-0">${prefix}${response?.data?.percentage}%</p>
+                                <p class="fs-3 mb-0">last year</p>
+                            </div>
+                        </div>
+                    `;
+
+                    $(`#card_container_yearly`).html(htmlContent);
+                },
+                error: function(error) {
+                    showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                        .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                }
+            });
+        }
+
         function getCategories(container) {
             ajaxRequest(`/api/categories`, 'GET')
                 .then(response => {
@@ -442,49 +454,66 @@
 
                 });
         }
+        const btnActionSaveTransaction = () => {
+            $('#btnSaveTransaction').off().on('click', function(e) {
+                e.preventDefault();
 
-        $('#btnSaveTransaction').off().on('click', function(e) {
-            e.preventDefault();
+                let formData = new FormData($('#formTransaction')[0]); // Use FormData directly
+                formData.append('user_id', <?= json_encode($user->id) ?>); // Add user_id
+                const authToken = "{{ session('auth_token') }}";
+                let headers = {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json' // Ensure Laravel returns JSON
+                };
 
-            let formData = new FormData($('#formTransaction')[0]);
-            let postData = {};
-            let userId = <?= json_encode($user->id) ?>;
-            formData.forEach(function(value, key) {
-                postData[key] = value;
-            });
+                let url = '/api/transactions';
+                let method = 'POST';
 
-            postData.user_id = userId;
-            console.log(postData);
-            if (!postData.id) {
-                console.log(`store`);
-                ajaxRequest('/api/transactions', 'POST', postData)
-                    .then(response => {
+                if (formData.get('id')) {
+                    url = `/api/transactions/${formData.get('id')}`;
+                    method = 'POST'; // Laravel method spoofing
+                    formData.append('_method', 'PUT');
+                }
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: formData,
+                    processData: false, // Required for FormData
+                    contentType: false, // Required for FormData
+                    headers: headers,
+                    success: function(response) {
                         if (response.status) {
                             fetchTransactions();
-                            showToast('Transaction created successfully!', 'success');
-                        }
-                    })
-                    .catch(error => {
-                        showToast(error.response.errors, 'danger');
-                    });
-            } else {
-                console.log(`put`);
-                ajaxRequest(`/api/transactions/${postData.id}`, 'PUT', postData)
-                    .then(response => {
-                        if (response.status) {
-                            fetchTransactions();
+                            getDataInYear();
                             $('#formTransaction')[0].reset();
                             $('#transactionModal').modal('hide');
-                            showToast('Transaction updated successfully!', 'success');
+                            showToast(
+                                `Transaction ${method === 'POST' ? 'created' : 'updated'} successfully!`,
+                                'success');
                         }
-                    })
-                    .catch(error => {
-                        showToast(error.response.errors, 'danger');
-                    });
-            }
-            // BELUM BISA EDIT DAN HAPUS & KETIKA BUKA MODAL SAAT EDIT RESET FORM KETIKA BUKA LAGI MODAL SAAT TAMBAH
+                    },
+                    error: function(error) {
+                        showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                            .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                    }
+                });
+            });
 
-        })
+            // Reset form when modal is opened for adding a new transaction
+            $('#transactionModal').on('show.bs.modal', function(event) {
+                let button = $(event.relatedTarget);
+                let transactionId = button.data('id');
+
+                if (!transactionId) {
+                    $('#formTransaction')[0].reset();
+                }
+            });
+
+            // KETIKA BUKA MODAL SAAT EDIT RESET FORM KETIKA BUKA LAGI MODAL SAAT TAMBAH
+
+        };
+
 
         $('#searchTransaction, #filterCategory, #filterMonth, #filterYear').on('input change', function() {
             const searchQuery = $('#searchTransaction').val(); // Search query
@@ -496,21 +525,32 @@
         });
 
         const deleteTransaction = (props) => {
-            console.log(props);
-            $('#confirmTransactionDeleteBtn').off().on('click', function(e) {
-                ajaxRequest(`/api/transactions/${props?.transaction_id}`, 'DELETE', props)
-                    .then(response => {
 
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            };
+
+            $('#confirmTransactionDeleteBtn').off().on('click', function(e) {
+
+                $.ajax({
+                    url: `/api/transactions/${props?.transaction_id}`,
+                    type: 'DELETE',
+                    headers: headers,
+                    success: function(response) {
                         if (response.status) {
                             fetchTransactions();
+                            getDataInYear();
                             $('#deleteTransactionModal').modal('hide');
                             showToast('Transaction deleted successfully!', 'success');
                         }
-
-                    })
-                    .catch(error => {
-                        showToast(error.response.error, 'danger');
-                    });
+                    },
+                    error: function(error) {
+                        showToast(error.responseJSON?.error || 'Failed to delete category',
+                            'danger');
+                    }
+                });
             })
         };
     </script>
