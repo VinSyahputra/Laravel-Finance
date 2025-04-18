@@ -5,58 +5,55 @@
 @section('content')
 
     <div class="container-fluid">
-        <!--  Row 1 -->
         <div class="row">
-            <div class="col-lg-4">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <!-- Yearly Breakup -->
-                        <div class="card overflow-hidden">
-                            <div class="card-body p-4">
-                                <h5 class="card-title mb-9 fw-semibold">Yearly Breakup</h5>
-                                <div class="row align-items-center" id="card_container_yearly">
+            <div class="col-6 col-lg-4">
+                <div class="card overflow-hidden">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-9 fw-semibold">Yearly Expenses</h5>
+                        <div class="row align-items-center" id="card_container_expense_yearly">
 
-                                </div>
-                            </div>
                         </div>
                     </div>
-                    <div class="col-lg-12">
-                        <!-- Monthly Earnings -->
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row alig n-items-start">
-                                    <div class="col-8">
-                                        <h5 class="card-title mb-9 fw-semibold"> Monthly Earnings </h5>
-                                        <h4 class="fw-semibold mb-3">$6,820</h4>
-                                        <div class="d-flex align-items-center pb-1">
-                                            <span
-                                                class="me-2 rounded-circle bg-light-danger round-20 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-arrow-down-right text-danger"></i>
-                                            </span>
-                                            <p class="text-dark me-1 fs-3 mb-0">+9%</p>
-                                            <p class="fs-3 mb-0">last year</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-4">
-                                        <div class="d-flex justify-content-end">
-                                            <div
-                                                class="text-white bg-secondary rounded-circle p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-currency-dollar fs-6"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div id="earning"></div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4">
+                <div class="card overflow-hidden">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-9 fw-semibold">Monthly Expenses</h5>
+                        <div class="row align-items-center" id="card_container_expense_monthly">
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="row">
+            <div class="col-6 col-lg-4">
+                <div class="card overflow-hidden">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-9 fw-semibold">Yearly Incomes</h5>
+                        <div class="row align-items-center" id="card_container_income_yearly">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-4">
+                <div class="card overflow-hidden">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-9 fw-semibold">Monthly Incomes</h5>
+                        <div class="row align-items-center" id="card_container_income_monthly">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="row">
             <div class="d-flex">
-                <button type="button" class="btn btn-primary mx-auto col-12 col-sm-8 col-md-5 mb-3" data-bs-toggle="modal"
-                    data-bs-target="#transactionModal">
+                <button type="button" class="btn btn-primary mx-auto col-12 col-sm-8 col-md-5 mb-3" id="addTransaction">
                     <span>
                         <i class="ti ti-new-section"></i> add transaction
                     </span>
@@ -107,6 +104,7 @@
                                         <th>Description</th>
                                         <th>Category</th>
                                         <th>Amount</th>
+                                        <th>Type</th>
                                         <th width="1%" class="text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -139,27 +137,38 @@
                     <form action="" method="post" id="formTransaction" class="row">
                         <input type="hidden" name="id" id="transaction_id">
                         <!-- Date Field -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="transaction_date" class="form-label">Date</label>
                             <input type="date" class="form-control" id="transaction_date" name="date">
                         </div>
 
-                        <!-- Description Field -->
-                        <div class="col-md-3 mb-3">
-                            <label for="transaction_description" class="form-label">Description</label>
-                            <input type="text" class="form-control" id="transaction_description" name="description">
-                        </div>
+
 
                         <!-- Category Field -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="transaction_category" class="form-label">Category</label>
                             <select class="form-select" id="transaction_category" name="category">
                                 <!-- Add more categories as needed -->
                             </select>
                         </div>
 
+                        <!-- Description Field -->
+                        <div class="col-md-12 mb-3">
+                            <label for="transaction_description" class="form-label">Description</label>
+                            <textarea class="form-control" id="transaction_description" name="description" rows="4"></textarea>
+                        </div>
+
+                        <!-- Type Field -->
+                        <div class="col-md-6 mb-3">
+                            <label for="transaction_type" class="form-label">Type</label>
+                            <select class="form-select" id="transaction_type" name="type">
+                                <option value="expense">Expense</option>
+                                <option value="income">Income</option>
+                            </select>
+                        </div>
+
                         <!-- Amount Field -->
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label for="transaction_amount" class="form-label">Amount</label>
                             <input type="text" class="form-control" id="transaction_amount" name="amount"
                                 step="0.01" oninput="formatPrice(this)">
@@ -200,12 +209,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            getDataInYear();
+            getDataExpenseInYear();
+            getDataIncomeInYear();
+            getDataExpenseInMonth();
+            getDataIncomeInMonth();
             populateYearSelect();
             getCategories('filterCategory');
             getCategories('transaction_category');
             fetchTransactions();
             btnActionSaveTransaction();
+
+            $('#addTransaction').on('click', e => {
+                $('#formTransaction')[0].reset();
+                $('#transaction_id').val('');
+                $('#transactionModal').modal('show');
+            })
         });
 
 
@@ -241,6 +259,9 @@
                           <td>${element?.description}</td>
                           <td>${element?.category.name}</td>
                           <td>Rp. ${formatPrice(element?.amount ?? 0)}</td>
+                          <td>
+                           <span class="badge rounded-3 fw-semibold pt-1 ${element?.type == 'income' ? 'bg-success' : 'bg-danger '}">${element?.type}</span>
+                          </td>
                           <td>
                             <div class="btn-group" role="group">
                               <button type="button" class="btn btn-outline-warning btn-update-transaction btn-sm" data-id="${element?.id}" data-transaction="${btoa(JSON.stringify(element))}">
@@ -285,14 +306,15 @@
                             }
 
                             $('#formTransaction input[name="id"]').val(transaction?.id);
-                            $(
-                                '#formTransaction input[name="description"]').val(transaction
+                            $('#formTransaction textarea[name="description"]').val(transaction
                                 ?.description);
                             $('#formTransaction input[name="amount"]').val(
                                 transaction?.amount);
 
                             $('#formTransaction select[name="category"]').val(transaction
                                 ?.category_id).change();
+                            $('#formTransaction select[name="type"]').val(transaction
+                                ?.type).change();
                         });
                     });
 
@@ -334,13 +356,6 @@
         });
 
 
-        // Handle search input
-        // $('#searchTransaction').on('keyup', function () {
-        //     const searchQuery = $(this).val(); // Get the current search value
-        //     const categoryId = $('#filterCategory').val(); // Get the current category ID
-        //     fetchTransactions('api/transactions', searchQuery, categoryId); // Fetch with search query and category filter
-        // });
-
         function populateYearSelect() {
             const currentYear = new Date().getFullYear();
             const $selectElement = $('#filterYear');
@@ -358,7 +373,7 @@
             }
         }
 
-        function getDataInYear() {
+        function getDataExpenseInYear() {
 
             const authToken = "{{ session('auth_token') }}";
             let headers = {
@@ -366,7 +381,7 @@
                 'Accept': 'application/json' // Ensure Laravel returns JSON
             };
 
-            let url = '/api/analytics/this-year';
+            let url = '/api/analytics/expense-this-year';
             let method = 'GET';
 
             $.ajax({
@@ -378,14 +393,12 @@
                     let iconClass = 'ti ti-arrows-left-right text-secondary'; // Default neutral icon
                     let prefix = '';
 
-                    if (response?.data?.status === 'up') {
-                        statusClass = 'success';
-                        iconClass = 'ti ti-arrow-up-left text-success';
-                        prefix = '+';
-                    } else if (response?.data?.status === 'down') {
+                    if (response?.data?.status === 'high') {
                         statusClass = 'danger';
-                        iconClass = 'ti ti-arrow-down-right text-danger';
-                        prefix = '';
+                        iconClass = 'ti ti-arrow-up-left text-danger';
+                    } else if (response?.data?.status === 'low') {
+                        statusClass = 'success';
+                        iconClass = 'ti ti-arrow-down-right text-success';
                     }
 
                     const totalAmount = Number(response?.data?.total_amount) || 0;
@@ -398,13 +411,172 @@
                                 <span class="me-1 rounded-circle bg-light-${statusClass} round-20 d-flex align-items-center justify-content-center">
                                     <i class="${iconClass}"></i>
                                 </span>
-                                <p class="text-dark me-1 fs-3 mb-0">${prefix}${response?.data?.percentage}%</p>
+                                <p class="text-dark me-1 fs-3 mb-0"> ${response?.data?.percentage}%</p>
                                 <p class="fs-3 mb-0">last year</p>
                             </div>
                         </div>
                     `;
 
-                    $(`#card_container_yearly`).html(htmlContent);
+                    $(`#card_container_expense_yearly`).html(htmlContent);
+                },
+                error: function(error) {
+                    showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                        .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                }
+            });
+        }
+
+        function getDataIncomeInYear() {
+
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json' // Ensure Laravel returns JSON
+            };
+
+            let url = '/api/analytics/income-this-year';
+            let method = 'GET';
+
+            $.ajax({
+                url: url,
+                type: method,
+                headers: headers,
+                success: function(response) {
+                    let statusClass = 'secondary';
+                    let iconClass = 'ti ti-arrows-left-right text-secondary'; // Default neutral icon
+                    let prefix = '';
+
+                    if (response?.data?.status === 'high') {
+                        statusClass = 'success';
+                        iconClass = 'ti ti-arrow-up-left text-success';
+                    } else if (response?.data?.status === 'low') {
+                        statusClass = 'danger';
+                        iconClass = 'ti ti-arrow-down-right text-danger';
+                    }
+
+                    const totalAmount = Number(response?.data?.total_amount) || 0;
+                    const formattedAmount = totalAmount.toLocaleString('id-ID');
+
+                    let htmlContent = `
+                        <div class="col-8">
+                            <h4 class="fw-semibold mb-3">RP. ${formattedAmount}</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="me-1 rounded-circle bg-light-${statusClass} round-20 d-flex align-items-center justify-content-center">
+                                    <i class="${iconClass}"></i>
+                                </span>
+                                <p class="text-dark me-1 fs-3 mb-0"> ${response?.data?.percentage}%</p>
+                                <p class="fs-3 mb-0">last year</p>
+                            </div>
+                        </div>
+                    `;
+
+                    $(`#card_container_income_yearly`).html(htmlContent);
+                },
+                error: function(error) {
+                    showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                        .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                }
+            });
+        }
+
+        function getDataExpenseInMonth() {
+
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json' // Ensure Laravel returns JSON
+            };
+
+            let url = '/api/analytics/expense-this-month';
+            let method = 'GET';
+
+            $.ajax({
+                url: url,
+                type: method,
+                headers: headers,
+                success: function(response) {
+                    let statusClass = 'secondary';
+                    let iconClass = 'ti ti-arrows-left-right text-secondary'; // Default neutral icon
+                    let prefix = '';
+
+                    if (response?.data?.status === 'high') {
+                        statusClass = 'danger';
+                        iconClass = 'ti ti-arrow-up-left text-danger';
+                    } else if (response?.data?.status === 'low') {
+                        statusClass = 'success';
+                        iconClass = 'ti ti-arrow-down-right text-success';
+                    }
+
+                    const totalAmount = Number(response?.data?.total_amount) || 0;
+                    const formattedAmount = totalAmount.toLocaleString('id-ID');
+
+                    let htmlContent = `
+                        <div class="col-8">
+                            <h4 class="fw-semibold mb-3">RP. ${formattedAmount}</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="me-1 rounded-circle bg-light-${statusClass} round-20 d-flex align-items-center justify-content-center">
+                                    <i class="${iconClass}"></i>
+                                </span>
+                                <p class="text-dark me-1 fs-3 mb-0"> ${response?.data?.percentage}%</p>
+                                <p class="fs-3 mb-0">last month</p>
+                            </div>
+                        </div>
+                    `;
+
+                    $(`#card_container_expense_monthly`).html(htmlContent);
+                },
+                error: function(error) {
+                    showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                        .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                }
+            });
+        }
+
+        function getDataIncomeInMonth() {
+
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json' // Ensure Laravel returns JSON
+            };
+
+            let url = '/api/analytics/income-this-month';
+            let method = 'GET';
+
+            $.ajax({
+                url: url,
+                type: method,
+                headers: headers,
+                success: function(response) {
+                    let statusClass = 'secondary';
+                    let iconClass = 'ti ti-arrows-left-right text-secondary'; // Default neutral icon
+                    let prefix = '';
+
+                    if (response?.data?.status === 'high') {
+                        statusClass = 'success';
+                        iconClass = 'ti ti-arrow-up-left text-success';
+                    } else if (response?.data?.status === 'low') {
+                        statusClass = 'danger';
+                        iconClass = 'ti ti-arrow-down-right text-danger';
+                    }
+
+                    const totalAmount = Number(response?.data?.total_amount) || 0;
+                    const formattedAmount = totalAmount.toLocaleString('id-ID');
+
+                    let htmlContent = `
+                        <div class="col-8">
+                            <h4 class="fw-semibold mb-3">RP. ${formattedAmount}</h4>
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="me-1 rounded-circle bg-light-${statusClass} round-20 d-flex align-items-center justify-content-center">
+                                    <i class="${iconClass}"></i>
+                                </span>
+                                <p class="text-dark me-1 fs-3 mb-0"> ${response?.data?.percentage}%</p>
+                                <p class="fs-3 mb-0">last month</p>
+                            </div>
+                        </div>
+                    `;
+
+                    $(`#card_container_income_monthly`).html(htmlContent);
                 },
                 error: function(error) {
                     showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
@@ -485,7 +657,10 @@
                     success: function(response) {
                         if (response.status) {
                             fetchTransactions();
-                            getDataInYear();
+                            getDataExpenseInYear();
+                            getDataIncomeInYear();
+                            getDataExpenseInMonth();
+                            getDataIncomeInMonth();
                             $('#formTransaction')[0].reset();
                             $('#transactionModal').modal('hide');
                             showToast(
@@ -501,14 +676,14 @@
             });
 
             // Reset form when modal is opened for adding a new transaction
-            $('#transactionModal').on('show.bs.modal', function(event) {
-                let button = $(event.relatedTarget);
-                let transactionId = button.data('id');
-
-                if (!transactionId) {
-                    $('#formTransaction')[0].reset();
-                }
-            });
+            // $('#transactionModal').on('show.bs.modal', function(event) {
+            //     let button = $(event.relatedTarget);
+            //     let transactionId = button.data('id');
+            //     if (!transactionId) {
+            //         console.log(button);
+            //         $('#formTransaction')[0].reset();
+            //     }
+            // });
 
             // KETIKA BUKA MODAL SAAT EDIT RESET FORM KETIKA BUKA LAGI MODAL SAAT TAMBAH
 
@@ -541,7 +716,10 @@
                     success: function(response) {
                         if (response.status) {
                             fetchTransactions();
-                            getDataInYear();
+                            getDataExpenseInYear();
+                            getDataIncomeInYear();
+                            getDataExpenseInMonth();
+                            getDataIncomeInMonth();
                             $('#deleteTransactionModal').modal('hide');
                             showToast('Transaction deleted successfully!', 'success');
                         }

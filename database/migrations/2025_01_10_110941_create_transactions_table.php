@@ -20,6 +20,7 @@ return new class extends Migration
                 ->on('categories')
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->string('type', 10);
             $table->uuid('input_by')->nullable();
             $table->timestamp('date');
             $table->timestamps();

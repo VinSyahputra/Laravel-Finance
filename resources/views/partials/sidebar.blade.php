@@ -50,6 +50,17 @@
                             </a>
                         </li>
                     @endcan
+
+                    {{-- @can('view setting') --}}
+                    <li class="sidebar-item">
+                        <a class="sidebar-link" href="{{ url('/settings') }}" aria-expanded="false">
+                            <span>
+                                <i class="ti ti-settings"></i>
+                            </span>
+                            <span class="hide-menu">Setting</span>
+                        </a>
+                    </li>
+                    {{-- @endcan --}}
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->

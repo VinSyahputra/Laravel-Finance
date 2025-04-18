@@ -40,7 +40,9 @@
                                 <tr>
                                     <th width="1%">No.</th>
                                     <th>Name</th>
-                                    <th width="1%" class="text-center">Action</th>
+                                    @canany(['update categories', 'delete categories'])
+                                        <th width="1%">Action</th>
+                                    @endcanany
                                 </tr>
                             </thead>
                             <tbody id="tbodyCategory">

@@ -25,21 +25,34 @@ class UserSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ];
+        $user2 = [
+            'id' => (string) Str::uuid(),
+            'name' => 'john doe',
+            'email' => 'johndoe@mail.com',
+            'password' => Hash::make('johndoe123'),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
 
         // Clear existing users
         if (User::count()) {
             User::truncate();
         }
 
-        // Insert the first user
+        // Insert the users
         User::insert($user);
+        User::insert($user2);
 
         // Assign roles and permissions with the correct guard
-        $superAdmin = User::first();
+        $superAdmin = User::where('email', 'admin@admin.com')->first();
+        $userAccount = User::where('email', 'johndoe@mail.com')->first();
 
         // Ensure roles and permissions use the sanctum guard
         $adminRole = Role::findByName('admin', 'sanctum'); // Retrieve role with sanctum guard
         $superAdmin->assignRole($adminRole); // Assign role
+
+        $userRole = Role::findByName('user', 'sanctum'); // Retrieve role with sanctum guard
+        $userAccount->assignRole($userRole); // Assign role
 
     }
 }

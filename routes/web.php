@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +39,18 @@ Route::prefix('categories')
 Route::prefix('transactions')
     ->middleware(['auth', 'verified'])
     ->controller(TransactionController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+    });
+Route::prefix('incomes')
+    ->middleware(['auth', 'verified'])
+    ->controller(IncomeController::class)
+    ->group(function () {
+        Route::get('/', 'index');
+    });
+Route::prefix('settings')
+    ->middleware(['auth', 'verified'])
+    ->controller(SettingController::class)
     ->group(function () {
         Route::get('/', 'index');
     });

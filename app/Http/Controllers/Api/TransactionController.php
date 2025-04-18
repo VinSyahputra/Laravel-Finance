@@ -78,6 +78,7 @@ class TransactionController extends Controller
             'date' => $request->date,
             'description' => $request->description,
             'category_id' => $request->category,
+            'type' => $request->type,
             'amount' => (int) str_replace('.', '', $request->amount),
             'input_by' => $request->user_id,
         ]);
@@ -198,10 +199,6 @@ class TransactionController extends Controller
             $transaction = Transaction::where('id', $userId)->get();
             if (!$transaction)
                 return $this->responseError(null, 'Not found', Response::HTTP_NOT_FOUND);
-            echo "<pre>";
-            var_dump($transaction);
-            die();
-            // return $this->responseSuccess(new ServiceResource($service), 'Get detail');
         } catch (\Exception $e) {
             return $this->responseError(null, 'Not found', Response::HTTP_NOT_FOUND);
         }

@@ -14,6 +14,7 @@ class Transaction extends Model
         'amount',
         'description',
         'category_id',
+        'type',
         'input_by',
         'date',
     ];

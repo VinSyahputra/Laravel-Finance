@@ -36,6 +36,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => $guard]);
         $staff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => $guard]);
         $finance = Role::firstOrCreate(['name' => 'finance', 'guard_name' => $guard]);
+        $user = Role::firstOrCreate(['name' => 'user', 'guard_name' => $guard]);
 
         // Assign permissions to admin
         $admin->syncPermissions(Permission::all());
@@ -44,5 +45,6 @@ class RolesAndPermissionsSeeder extends Seeder
         $viewPermissions = Permission::where('name', 'LIKE', 'view%')->get();
         $staff->syncPermissions($viewPermissions);
         $finance->syncPermissions($viewPermissions);
+        $user->syncPermissions($viewPermissions);
     }
 }

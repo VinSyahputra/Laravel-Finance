@@ -30,6 +30,11 @@ Route::prefix('analytics')
     ->middleware('auth:sanctum')
     ->controller(AnalyticController::class)
     ->group(function () {
-        Route::get('/this-year', 'getDataThisYear');
-        Route::get('/recent-transactions', 'getDataRecentTransactions');
+        Route::get('/expense-this-year', 'getDataExpenseThisYear');
+        Route::get('/income-this-year', 'getDataIncomeThisYear');
+        Route::get('/expense-this-month', 'getDataExpenseThisMonth');
+        Route::get('/income-this-month', 'getDataIncomeThisMonth');
+        Route::get('/recent-expenses', 'getDataRecentExpenses');
+        Route::get('/recent-incomes', 'getDataRecentIncomes');
+        Route::get('/balance', 'getBalance');
     });
