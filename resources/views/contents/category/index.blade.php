@@ -25,7 +25,7 @@
                                     class="btn btn-primary btn-add-category mx-auto col-12 col-sm-8 col-md-5 mb-3"
                                     data-bs-toggle="modal" data-bs-target="#categoryModal">
                                     <span>
-                                        <i class="ti ti-new-section"></i> add category
+                                        <i class="ti ti-plus"></i> Add Category
                                     </span>
                                 </button>
                             </div>

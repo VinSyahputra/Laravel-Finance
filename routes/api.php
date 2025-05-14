@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AnalyticController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,4 +38,14 @@ Route::prefix('analytics')
         Route::get('/recent-expenses', 'getDataRecentExpenses');
         Route::get('/recent-incomes', 'getDataRecentIncomes');
         Route::get('/balance', 'getBalance');
+    });
+
+Route::prefix('settings')
+    ->middleware('auth:sanctum')
+    ->controller(SettingController::class)
+    ->group(function () {
+        Route::get('/roles', 'getRoles')->withoutMiddleware('auth:sanctum');
+        Route::post('/roles', 'storeRole');
+        Route::get('/roles/{roleId}', 'getPermissionsByRole');
+        Route::get('/permissions', 'getPermissions');
     });

@@ -7,13 +7,10 @@ use Illuminate\Support\Facades\Auth;
 
 class SettingController extends Controller
 {
-    public function index(Request $request)
+
+    public function getRoles(Request $request)
     {
-        // echo "<pre>";
-        // var_dump(Auth::user()->getAllPermissions()->pluck('name'));
-        // var_dump(Auth::user()->getRoleNames());
-        // die();
-        return view('contents.setting.index', [
+        return view('contents.setting.roles', [
             'user' => Auth::user()
         ]);
     }

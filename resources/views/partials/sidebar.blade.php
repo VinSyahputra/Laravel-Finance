@@ -53,7 +53,7 @@
 
                     {{-- @can('view setting') --}}
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="{{ url('/settings') }}" aria-expanded="false">
+                        <a class="sidebar-link" href="{{ url('/settings/roles') }}" aria-expanded="false">
                             <span>
                                 <i class="ti ti-settings"></i>
                             </span>

@@ -42,17 +42,14 @@ Route::prefix('transactions')
     ->group(function () {
         Route::get('/', 'index');
     });
-Route::prefix('incomes')
-    ->middleware(['auth', 'verified'])
-    ->controller(IncomeController::class)
-    ->group(function () {
-        Route::get('/', 'index');
-    });
+
 Route::prefix('settings')
     ->middleware(['auth', 'verified'])
     ->controller(SettingController::class)
     ->group(function () {
-        Route::get('/', 'index');
+        Route::get('roles', 'getRoles');
+        // Route::get('permissions', 'getPermissions');
+        // Route::get('users', 'getUsers');
     });
 
 

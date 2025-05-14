@@ -55,7 +55,7 @@
             <div class="d-flex">
                 <button type="button" class="btn btn-primary mx-auto col-12 col-sm-8 col-md-5 mb-3" id="addTransaction">
                     <span>
-                        <i class="ti ti-new-section"></i> add transaction
+                        <i class="ti ti-plus"></i> Add Transaction
                     </span>
                 </button>
             </div>
