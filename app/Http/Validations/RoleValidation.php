@@ -16,7 +16,7 @@ class RoleValidation
     public static function update()
     {
         return [
-            'name' => ['required', 'string', 'max:255', 'unique:categories,name'],
+            'role_name' => ['required', 'string', 'max:255', 'unique:categories,name'],
         ];
     }
 }

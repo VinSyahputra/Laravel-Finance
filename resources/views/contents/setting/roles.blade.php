@@ -44,6 +44,12 @@
 
                             </tbody>
                         </table>
+                        <div class="d-flex justify-content-center mt-3">
+                            <!-- Pagination links -->
+                            <nav>
+                                <ul class="pagination" id="paginationRoleLinks"></ul>
+                            </nav>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -87,6 +93,25 @@
             </div>
         </div>
     </div>
+
+     <!-- Delete Confirmation Modal -->
+     <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteRoleModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this item?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteRoleBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -98,30 +123,32 @@
         });
 
         const actionResetModal = () => {
-            $('#roleModal').on('show.bs.modal', function(e) {
-                getDataPermissions();
+            $('#roleModal').on('show.bs.modal', async function(e) {
+                
                 const triggerButton = $(e.relatedTarget);
                 if (triggerButton.hasClass('btn-add-role')) {
-
+                    getDataPermissions();
                     $('#formRole')[0].reset();
                     $('#formRole input[name="id"]').val('');
                 } else {
-                    const roleId = $('#formRole input[name="id"]').val();
-                    getDataPermissionsByRole(roleId);
+                    try {
+                        const roleId = $('#formRole input[name="id"]').val();
+                        const permissions = await getDataPermissionsByRole(roleId);
+                        getDataPermissions(permissions);
+                    } catch (error) {
+                        console.error('Error fetching permissions:', error);
+                    }
                 }
 
             });
         }
 
         const fetchRoles = (url = '/api/settings/roles', searchQuery = '') => {
-            console.log(`Fetching roles from URL: ${url}`);
             if (searchQuery) {
                 const querySymbol = url.includes('?') ? '&' : '?';
                 url += `${querySymbol}search=${searchQuery}`;
             }
             const userPermissions = @json(auth()->user()->getPermissionsViaRoles()->pluck('name'));
-
-            // console.log(`User Permissions:`, userPermissions);
 
             ajaxRequest(url)
                 .then(response => {
@@ -139,12 +166,12 @@
                             <i class="ti ti-edit"></i>
                         </button>`;
                         // }
-                        if (userPermissions.includes('delete roles')) {
+                        // if (userPermissions.includes('delete roles')) {
                             deleteButton = `
                         <button type="button" class="btn btn-outline-danger btn-delete-role btn-sm" data-id="${element.id}">
                             <i class="ti ti-trash"></i>
                         </button>`;
-                        }
+                        // }
 
                         htmlContent += `
                         <tr>    
@@ -161,15 +188,15 @@
 
                     $('#tbodyRoles').html(htmlContent);
 
-                    // // Delete button click handler
-                    // $('.btn-delete-role').off('click').on('click', function(e) {
-                    //     e.preventDefault();
-                    //     const categoryId = $(this).data('id');
-                    //     $('#deleteModal').modal('show');
-                    //     deleteCategory({
-                    //         category_id: categoryId
-                    //     });
-                    // });
+                    // Delete button click handler
+                    $('.btn-delete-role').off('click').on('click', function(e) {
+                        e.preventDefault();
+                        const roleId = $(this).data('id');
+                        $('#deleteRoleModal').modal('show');
+                        deleteRole({
+                            role_id: roleId
+                        });
+                    });
 
                     // Edit button click handler
                     $('.btn-update-role').off('click').on('click', function(e) {
@@ -194,7 +221,7 @@
                     </li>`;
                     });
 
-                    $('#paginationLinks').html(paginationHtml);
+                    $('#paginationRoleLinks').html(paginationHtml);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -213,7 +240,6 @@
                 e.preventDefault();
                 const authToken = "{{ session('auth_token') }}";
                 let formData = new FormData($('#formRole')[0]);
-                console.log(`Form Data:`, formData);
                 let headers = {
                     'Authorization': `Bearer ${authToken}`
                 };
@@ -222,7 +248,7 @@
                 let method = 'POST';
 
                 if (formData.get('id')) {
-                    url = `/api/roles/${formData.get('id')}`;
+                    url = `/api/settings/roles/${formData.get('id')}`;
                     method = 'POST';
                     formData.append('_method', 'PUT');
                 }
@@ -235,7 +261,6 @@
                     contentType: false,
                     headers: headers,
                     success: function(response) {
-                        console.log(`RESPONSE :`, response.status);
                         if (response.status) {
                             fetchRoles();
                             $('#formRole')[0].reset();
@@ -251,12 +276,12 @@
             });
         };
 
-        function getDataPermissions() {
-
+        function getDataPermissions(parram = []) {
+            console.log(`parram`, parram);
             const authToken = "{{ session('auth_token') }}";
             let headers = {
                 'Authorization': `Bearer ${authToken}`,
-                'Accept': 'application/json' // Ensure Laravel returns JSON
+                'Accept': 'application/json' 
             };
 
             let url = '/api/settings/permissions?page=1&per_page=200';
@@ -267,17 +292,20 @@
                 type: method,
                 headers: headers,
                 success: function(response) {
-                    console.log(response.data);
+                    const parramIds = parram.map(item => item.id);
+
                     let data = response.data.map(item => ({
                         id: item.id,
-                        name: item.name
+                        name: item.name,
+                        checked: parramIds.includes(item.id)
                     })).sort((a, b) => a.id - b.id);
                     let html = '';
+                    console.log(`data`, data);
                     data.forEach(item => {
                         html += `
                             <div class="">
                                 <div class="form-check">
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="${item.id}" id="permission_${item.id}">
+                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="${item.id}" id="permission_${item.id}"  ${item.checked ? 'checked' : ''}>
                                     <label class="form-check-label" for="permission_${item.id}">
                                         ${item.name}
                                     </label>
@@ -297,41 +325,67 @@
             const authToken = "{{ session('auth_token') }}";
             let headers = {
                 'Authorization': `Bearer ${authToken}`,
-                'Accept': 'application/json' // Ensure Laravel returns JSON
+                'Accept': 'application/json'
             };
 
             let url = `/api/settings/roles/${roleId}?page=1&per_page=200`;
-            let method = 'GET';
 
-            $.ajax({
-                url: url,
-                type: method,
-                headers: headers,
-                success: function(response) {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    headers: headers,
+                    success: function(response) {
+                        let data = response.data.permissions.map(item => ({
+                            id: item.id,
+                            name: item.name
+                        })).sort((a, b) => a.id - b.id);
 
-                    let data = response.data.permissions.map(item => ({
-                        id: item.id,
-                        name: item.name
-                    })).sort((a, b) => a.id - b.id);
-                    let html = '';
-                    data.forEach(item => {
-                        html += `
-                            <div class="">
-                                <div class="form-check">
-                                    <input class="form-check-input" name="permissions[]" type="checkbox" value="${item.id}" id="permission_${item.id}">
-                                    <label class="form-check-label" for="permission_${item.id}">
-                                        ${item.name}
-                                    </label>
-                                </div>
-                            </div>
-                    `;
-                    });
-                    $('#containerPermission').html(html);
-                },
-                error: function(xhr, status, error) {
-                    console.error('Error fetching data:', error);
-                }
+                        resolve(data);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching data:', error);
+                        reject(error);
+                    }
+                });
             });
         }
+
+        const deleteRole = (props) => {
+            $('#confirmDeleteRoleBtn').off().on('click', function(e) {
+                e.preventDefault();
+                const authToken = "{{ session('auth_token') }}";
+                let headers = {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Accept': 'application/json'
+                };
+
+                $.ajax({
+                    url: `/api/settings/roles/${props?.role_id}`,
+                    type: 'DELETE',
+                    headers: headers,
+                    success: function(response) {
+                        if (response.status) {
+                            fetchRoles();
+                            $('#deleteRoleModal').modal('hide');
+                            showToast('Role deleted successfully!', 'success');
+                        }
+                    },
+                    error: function(error) {
+                        showToast(error.responseJSON?.error || 'Failed to delete role',
+                            'danger');
+                    }
+                });
+            });
+        };
+
+        // Handle pagination link clicks
+        $('#paginationRoleLinks').on('click', '.page-link', function(e) {
+            e.preventDefault();
+            const url = $(this).data('url');
+            if (url) {
+                fetchRoles(url);
+            }
+        });
     </script>
 @endpush

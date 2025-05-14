@@ -46,6 +46,8 @@ Route::prefix('settings')
     ->group(function () {
         Route::get('/roles', 'getRoles')->withoutMiddleware('auth:sanctum');
         Route::post('/roles', 'storeRole');
+        Route::put('/roles/{roleId}', 'updateRole');
+        Route::delete('/roles/{roleId}', 'deleteRole');
         Route::get('/roles/{roleId}', 'getPermissionsByRole');
         Route::get('/permissions', 'getPermissions');
     });
