@@ -48,8 +48,8 @@ Route::prefix('settings')
     ->controller(SettingController::class)
     ->group(function () {
         Route::get('roles', 'getRoles');
-        // Route::get('permissions', 'getPermissions');
-        // Route::get('users', 'getUsers');
+        Route::get('categories', 'getCategories');
+        Route::get('users', 'getUsers');
     });
 
 

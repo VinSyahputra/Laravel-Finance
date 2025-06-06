@@ -52,7 +52,7 @@
                     @endcan
 
                     {{-- @can('view setting') --}}
-                    <li class="sidebar-item">
+                    <li class="sidebar-item {{ Request::is('settings*') ? 'active selected' : '' }}">
                         <a class="sidebar-link" href="{{ url('/settings/roles') }}" aria-expanded="false">
                             <span>
                                 <i class="ti ti-settings"></i>

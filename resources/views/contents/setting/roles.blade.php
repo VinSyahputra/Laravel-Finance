@@ -13,24 +13,19 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3">
-                <div class="card">
-                    <div class="list-group list-group-flush">
-                        <a href="#" class="list-group-item list-group-item-action active">Role</a>
-                        <a href="#" class="list-group-item list-group-item-action">Permission</a>
-                        <a href="#" class="list-group-item list-group-item-action">User</a>
-                        <a href="#" class="list-group-item list-group-item-action">Category</a>
-                    </div>
-                </div>
-            </div>
+            <x-setting-sidebar></x-setting-sidebar>
 
             <!-- Content -->
             <div class="col-md-9">
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex">
+                        <div class="d-flex mb-3">
                             <button class="btn btn-primary btn-sm ms-auto btn-add-role" data-bs-toggle="modal"
                                 data-bs-target="#roleModal"><i class="ti ti-plus"></i> Add Roles</button>
+                        </div>
+                        <div class="d-flex mb-3">
+                            <input type="search" class="form-control me-2" id="searchRole"
+                                placeholder="Search roles...">
                         </div>
                         <table class="table table-sm table-hover mt-3">
                             <thead>
@@ -120,7 +115,29 @@
             fetchRoles();
             actionResetModal();
             btnActionSave();
+            actionSearch();
+            paginateRole();
         });
+
+        const actionSearch = () => {
+            // Handle search input
+            $('#searchRole').on('keyup', function() {
+                const searchQuery = $(this).val();
+                fetchRoles('/api/settings/roles', searchQuery);
+            });
+        }
+
+        const paginateRole = () => {
+            // Handle pagination link clicks
+            $('#paginationRoleLinks').on('click', '.page-link', function(e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                if (url) {
+                    const searchQuery = $('#searchRole').val(); 
+                    fetchRoles(url, searchQuery);
+                }
+            });
+        }
 
         const actionResetModal = () => {
             $('#roleModal').on('show.bs.modal', async function(e) {
@@ -379,13 +396,5 @@
             });
         };
 
-        // Handle pagination link clicks
-        $('#paginationRoleLinks').on('click', '.page-link', function(e) {
-            e.preventDefault();
-            const url = $(this).data('url');
-            if (url) {
-                fetchRoles(url);
-            }
-        });
     </script>
 @endpush

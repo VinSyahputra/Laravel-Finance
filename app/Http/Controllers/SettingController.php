@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 
 class SettingController extends Controller
 {
@@ -12,6 +14,23 @@ class SettingController extends Controller
     {
         return view('contents.setting.roles', [
             'user' => Auth::user()
+        ]);
+    }
+
+    public function getUsers(Request $request)
+    {
+        $role = Role::get(['name', 'id']);
+        return view('contents.setting.users', [
+            'user' => Auth::user(),
+            'roles' => $role
+        ]);
+    }
+
+    public function getCategories(Request $request)
+    {
+        $category = Category::get(['name', 'id']);
+        return view('contents.setting.categories', [
+            'user' => Auth::user(),
         ]);
     }
 }
