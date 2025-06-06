@@ -105,6 +105,7 @@
             btnActionSave();
             paginateCategory();
             actionSearch();
+            triggerBtnToClick();
         });
 
         const actionSearch = () => {
@@ -121,11 +122,25 @@
                 e.preventDefault();
                 const url = $(this).data('url');
                 if (url) {
-                    const searchQuery = $('#searchCategory').val(); 
+                    const searchQuery = $('#searchCategory').val();
                     fetchCategories(url, searchQuery);
                 }
             });
         }
+
+        const triggerBtnToClick = (e) => {
+            // Prevent form submission on Enter and trigger the button click event
+            $('#formCategory').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent default form submission
+                    $('#btnSaveCategory').click(); // Trigger the save button's click event
+                }
+            });
+        }
+        
+        $('#categoryModal').on('shown.bs.modal', function(e) {
+            $('#category_name').focus();
+        });
 
         const actionResetModal = () => {
             $('#categoryModal').on('show.bs.modal', async function(e) {
@@ -150,6 +165,16 @@
                 const querySymbol = url.includes('?') ? '&' : '?';
                 url += `${querySymbol}search=${searchQuery}`;
             }
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            };
+
+            $.ajaxSetup({
+                headers: headers
+            });
+
             const userPermissions = @json(auth()->user()->getPermissionsViaRoles()->pluck('name'));
 
             ajaxRequest(url)
@@ -225,7 +250,7 @@
                                         .email);
                                     $('#formCategory input[name="id"]').val(response.data.id);
                                     console.log($('#formCategory select[name="role_id"]')
-                                    .html());
+                                        .html());
                                     $('#formCategory select[name="role_id"]').val(response.data
                                         .role[0].id);
                                 }
@@ -326,6 +351,5 @@
                 });
             });
         };
-
     </script>
 @endpush

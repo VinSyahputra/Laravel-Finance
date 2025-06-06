@@ -1,31 +1,19 @@
 <?php
 
 use App\Http\Controllers\Api\AnalyticController;
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\Setting\CategoryController;
+use App\Http\Controllers\Api\Setting\PermissionController;
+use App\Http\Controllers\Api\Setting\RoleController;
+use App\Http\Controllers\Api\Setting\UserController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::prefix('categories')
-    ->middleware('auth:sanctum')
-    ->controller(CategoryController::class)
-    ->group(function () {
-        Route::get('/', 'index')->withoutMiddleware('auth:sanctum');
-        Route::post('/', 'store');
-        Route::put('{categoryId}', 'update');
-        Route::delete('{categoryId}', 'destroy');
-    });
+Route::get('categories', [CategoryController::class, 'index'])
+    ->withoutMiddleware('auth:sanctum');
 
-Route::prefix('transactions')
-    ->middleware('auth:sanctum')
-    ->controller(TransactionController::class)
-    ->group(function () {
-        Route::get('/', 'index')->withoutMiddleware('auth:sanctum');
-        Route::post('/', 'store');
-        Route::put('{categoryId}', 'update');
-        Route::delete('{categoryId}', 'destroy');
-    });
+
+Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
 
 Route::prefix('analytics')
     ->middleware('auth:sanctum')
@@ -42,25 +30,13 @@ Route::prefix('analytics')
 
 Route::prefix('settings')
     ->middleware('auth:sanctum')
-    ->controller(SettingController::class)
     ->group(function () {
-        Route::get('/roles', 'getRoles')->withoutMiddleware('auth:sanctum');
-        Route::post('/roles', 'storeRole');
-        Route::put('/roles/{roleId}', 'updateRole');
-        Route::delete('/roles/{roleId}', 'deleteRole');
-        Route::get('/roles/{roleId}', 'getPermissionsByRole');
 
-        Route::get('/permissions', 'getPermissions');
+        Route::resource('roles', RoleController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-        Route::get('/users', 'getUsers')->withoutMiddleware('auth:sanctum');
-        Route::post('/users', 'storeUser');
-        Route::get('/users/{userId}', 'getUserById');
-        Route::put('/users/{userId}', 'updateUser');
-        Route::delete('/users/{userId}', 'deleteUser');
-        
-        Route::get('/categories', 'getCategories')->withoutMiddleware('auth:sanctum');
-        Route::post('/categories', 'storeCategory');
-        Route::get('/categories/{categoryId}', 'getCategoryById');
-        Route::put('/categories/{categoryId}', 'updateCategory');
-        Route::delete('/categories/{categoryId}', 'deleteCategory');
+        Route::resource('permissions', PermissionController::class)->only(['index']);
+
+        Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
+
+        Route::resource('categories', CategoryController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
     });

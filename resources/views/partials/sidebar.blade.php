@@ -40,17 +40,6 @@
                         </li>
                     @endcan
 
-                    @can('view categories')
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="{{ url('/categories') }}" aria-expanded="false">
-                                <span>
-                                    <i class="ti ti-category-2"></i>
-                                </span>
-                                <span class="hide-menu">Category</span>
-                            </a>
-                        </li>
-                    @endcan
-
                     {{-- @can('view setting') --}}
                     <li class="sidebar-item {{ Request::is('settings*') ? 'active selected' : '' }}">
                         <a class="sidebar-link" href="{{ url('/settings/roles') }}" aria-expanded="false">

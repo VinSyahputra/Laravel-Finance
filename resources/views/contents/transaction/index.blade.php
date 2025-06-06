@@ -147,7 +147,7 @@
                         <!-- Category Field -->
                         <div class="col-md-6 mb-3">
                             <label for="transaction_category" class="form-label">Category</label>
-                            <select class="form-select" id="transaction_category" name="category">
+                            <select class="form-select" id="transaction_category" name="category_id">
                                 <!-- Add more categories as needed -->
                             </select>
                         </div>
@@ -232,6 +232,16 @@
             const params = new URLSearchParams();
             let userId = <?= json_encode($user->id) ?>;
 
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            };
+
+            $.ajaxSetup({
+                headers: headers
+            });
+            
             params.append('user_id', userId);
 
             if (searchQuery) params.append('search', searchQuery); // Search query
@@ -257,7 +267,7 @@
                           <td>${startIndex + index + 1}</td> <!-- Adjusted index -->
                           <td>${moment(element?.date).format('DD/MMM/YYYY')}</td>
                           <td>${element?.description}</td>
-                          <td>${element?.category.name}</td>
+                          <td>${element?.category?.name || 'No Category'}</td>
                           <td>Rp. ${formatPrice(element?.amount ?? 0)}</td>
                           <td>
                            <span class="badge rounded-3 fw-semibold pt-1 ${element?.type == 'income' ? 'bg-success' : 'bg-danger '}">${element?.type}</span>
@@ -294,6 +304,7 @@
                     $('.btn-update-transaction').each(function() {
                         $(this).off('click').on('click', function(e) {
                             e.preventDefault();
+                            console.log(`clicked update`);
                             const transaction = JSON.parse(atob($(this).data('transaction')));
 
                             $('#transactionModal').modal('show');
@@ -311,7 +322,7 @@
                             $('#formTransaction input[name="amount"]').val(
                                 transaction?.amount);
 
-                            $('#formTransaction select[name="category"]').val(transaction
+                            $('#formTransaction select[name="category_id"]').val(transaction
                                 ?.category_id).change();
                             $('#formTransaction select[name="type"]').val(transaction
                                 ?.type).change();

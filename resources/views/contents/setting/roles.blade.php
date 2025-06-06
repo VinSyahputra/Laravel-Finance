@@ -117,6 +117,7 @@
             btnActionSave();
             actionSearch();
             paginateRole();
+            triggerBtnToClick();
         });
 
         const actionSearch = () => {
@@ -135,6 +136,16 @@
                 if (url) {
                     const searchQuery = $('#searchRole').val(); 
                     fetchRoles(url, searchQuery);
+                }
+            });
+        }
+        
+        const triggerBtnToClick = (e) => {
+            // Prevent form submission on Enter and trigger the button click event
+            $('#formRole').on('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // Prevent default form submission
+                    $('#btnSaveRole').click(); // Trigger the save button's click event
                 }
             });
         }
@@ -165,6 +176,17 @@
                 const querySymbol = url.includes('?') ? '&' : '?';
                 url += `${querySymbol}search=${searchQuery}`;
             }
+
+            const authToken = "{{ session('auth_token') }}";
+            let headers = {
+                'Authorization': `Bearer ${authToken}`,
+                'Accept': 'application/json'
+            };
+
+            $.ajaxSetup({
+                headers: headers
+            });
+
             const userPermissions = @json(auth()->user()->getPermissionsViaRoles()->pluck('name'));
 
             ajaxRequest(url)

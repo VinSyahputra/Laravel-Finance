@@ -129,7 +129,6 @@ class TransactionController extends Controller
             if (isset($input['amount'])) {
                 $input['amount'] = (int) str_replace('.', '', $input['amount']);
             }
-
             // Perform validation
             $validated = Validator::make($input, TransactionValidation::update());
 

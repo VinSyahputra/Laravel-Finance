@@ -28,6 +28,9 @@ class SettingController extends Controller
 
     public function getCategories(Request $request)
     {
+        // if (!$request->user()->can('view categories')) {
+        //     return redirect()->route('dashboard')->with('error', 'You do not have permission to view categories.');
+        // }
         $category = Category::get(['name', 'id']);
         return view('contents.setting.categories', [
             'user' => Auth::user(),

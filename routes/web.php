@@ -30,12 +30,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::prefix('categories')
-    ->middleware(['auth', 'verified'])
-    ->controller(CategoryController::class)
-    ->group(function () {
-        Route::get('/', 'index');
-    });
 Route::prefix('transactions')
     ->middleware(['auth', 'verified'])
     ->controller(TransactionController::class)
