@@ -101,64 +101,17 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetchCategories();
-            actionResetModal();
+            actionResetModal('#categoryModal', '#formCategory', 'btn-add-category');
             btnActionSave();
-            paginateCategory();
-            actionSearch();
-            triggerBtnToClick();
+            pagination('#paginationCategoryLinks',fetchCategories, '#searchCategory');
+            actionSearch('#searchCategory', fetchCategories, '/api/settings/categories');
+            triggerBtnOnEnter('#formCategory', '#btnSaveCategory');
         });
 
-        const actionSearch = () => {
-            // Handle search input
-            $('#searchCategory').on('keyup', function() {
-                const searchQuery = $(this).val();
-                fetchCategories('/api/settings/categories', searchQuery);
-            });
-        }
-
-        const paginateCategory = () => {
-            // Handle pagination link clicks
-            $('#paginationCategoryLinks').on('click', '.page-link', function(e) {
-                e.preventDefault();
-                const url = $(this).data('url');
-                if (url) {
-                    const searchQuery = $('#searchCategory').val();
-                    fetchCategories(url, searchQuery);
-                }
-            });
-        }
-
-        const triggerBtnToClick = (e) => {
-            // Prevent form submission on Enter and trigger the button click event
-            $('#formCategory').on('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Prevent default form submission
-                    $('#btnSaveCategory').click(); // Trigger the save button's click event
-                }
-            });
-        }
         
         $('#categoryModal').on('shown.bs.modal', function(e) {
             $('#category_name').focus();
         });
-
-        const actionResetModal = () => {
-            $('#categoryModal').on('show.bs.modal', async function(e) {
-
-                const triggerButton = $(e.relatedTarget);
-                if (triggerButton.hasClass('btn-add-category')) {
-                    $('#formCategory')[0].reset();
-                    $('#formCategory input[name="id"]').val('');
-                } else {
-                    try {
-                        const categoryId = $('#formCategory input[name="id"]').val();
-                    } catch (error) {
-                        console.error('Error fetching categories:', error);
-                    }
-                }
-
-            });
-        }
 
         const fetchCategories = (url = '/api/settings/categories', searchQuery = '') => {
             if (searchQuery) {

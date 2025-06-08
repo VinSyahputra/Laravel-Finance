@@ -129,60 +129,13 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetchUsers();
-            actionSearch()
-            paginateUser();
-            actionResetModal();
+            actionSearch('#searchUser', fetchUsers, '/api/settings/users');
+            pagination('#paginationUserLinks',fetchUsers, '#searchUser');
+            actionResetModal('#userModal', '#formUser', 'btn-add-user');
             btnActionSave();
-            triggerBtnToClick();
+            triggerBtnOnEnter('#formUser', '#btnSaveUser');
         });
 
-        const actionSearch = () => {
-            // Handle search input
-            $('#searchUser').on('keyup', function() {
-                const searchQuery = $(this).val();
-                fetchUsers('/api/settings/users', searchQuery);
-            });
-        }
-
-        const paginateUser = () => {
-            // Handle pagination link clicks
-            $('#paginationUserLinks').on('click', '.page-link', function(e) {
-                e.preventDefault();
-                const url = $(this).data('url');
-                if (url) {
-                    const searchQuery = $('#searchUser').val(); 
-                    fetchUsers(url, searchQuery);
-                }
-            });
-        }
-
-        const actionResetModal = () => {
-            $('#userModal').on('show.bs.modal', async function(e) {
-
-                const triggerButton = $(e.relatedTarget);
-                if (triggerButton.hasClass('btn-add-user')) {
-                    $('#formUser')[0].reset();
-                    $('#formUser input[name="id"]').val('');
-                } else {
-                    try {
-                        const userId = $('#formUser input[name="id"]').val();
-                    } catch (error) {
-                        console.error('Error fetching permissions:', error);
-                    }
-                }
-
-            });
-        }
-
-        const triggerBtnToClick = (e) => {
-            // Prevent form submission on Enter and trigger the button click event
-            $('#formUser').on('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Prevent default form submission
-                    $('#btnSaveUser').click(); // Trigger the save button's click event
-                }
-            });
-        }
 
         const fetchUsers = (url = '/api/settings/users', searchQuery = '') => {
             if (searchQuery) {

@@ -113,63 +113,14 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetchRoles();
-            actionResetModal();
+            actionResetModal('#roleModal', '#formRole', 'btn-add-role');
             btnActionSave();
-            actionSearch();
-            paginateRole();
-            triggerBtnToClick();
+            actionSearch('#searchRole', fetchRoles, '/api/settings/roles');
+            pagination('#paginationRoleLinks',fetchRoles, '#searchRole');
+            triggerBtnOnEnter('#formRole', '#btnSaveRole');
         });
 
-        const actionSearch = () => {
-            // Handle search input
-            $('#searchRole').on('keyup', function() {
-                const searchQuery = $(this).val();
-                fetchRoles('/api/settings/roles', searchQuery);
-            });
-        }
-
-        const paginateRole = () => {
-            // Handle pagination link clicks
-            $('#paginationRoleLinks').on('click', '.page-link', function(e) {
-                e.preventDefault();
-                const url = $(this).data('url');
-                if (url) {
-                    const searchQuery = $('#searchRole').val(); 
-                    fetchRoles(url, searchQuery);
-                }
-            });
-        }
         
-        const triggerBtnToClick = (e) => {
-            // Prevent form submission on Enter and trigger the button click event
-            $('#formRole').on('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault(); // Prevent default form submission
-                    $('#btnSaveRole').click(); // Trigger the save button's click event
-                }
-            });
-        }
-
-        const actionResetModal = () => {
-            $('#roleModal').on('show.bs.modal', async function(e) {
-                
-                const triggerButton = $(e.relatedTarget);
-                if (triggerButton.hasClass('btn-add-role')) {
-                    getDataPermissions();
-                    $('#formRole')[0].reset();
-                    $('#formRole input[name="id"]').val('');
-                } else {
-                    try {
-                        const roleId = $('#formRole input[name="id"]').val();
-                        const permissions = await getDataPermissionsByRole(roleId);
-                        getDataPermissions(permissions);
-                    } catch (error) {
-                        console.error('Error fetching permissions:', error);
-                    }
-                }
-
-            });
-        }
 
         const fetchRoles = (url = '/api/settings/roles', searchQuery = '') => {
             if (searchQuery) {

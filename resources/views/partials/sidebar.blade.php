@@ -3,8 +3,8 @@
         <!-- Sidebar scroll-->
         <div>
             <div class="brand-logo d-flex align-items-center justify-content-between">
-                <a href="/" class="text-nowrap logo-img">
-                    <img src="{{ asset('assets/images/logos/dark-logo.svg') }}" width="180" alt="" />
+                <a href="/" wire:navigate class="text-nowrap logo-img">
+                    <img src="{{ asset('assets/images/logos/new-logo2.png') }}" width="150" alt="" />
                 </a>
                 <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                     <i class="ti ti-x fs-8"></i>
@@ -18,7 +18,7 @@
                         <span class="hide-menu">Home</span>
                     </li>
                     <li class="sidebar-item">
-                        <a class="sidebar-link" href="/" aria-expanded="false">
+                        <a class="sidebar-link" href="/" wire:navigate aria-expanded="false">
                             <span>
                                 <i class="ti ti-layout-dashboard"></i>
                             </span>
@@ -31,7 +31,7 @@
                     </li>
                     @can('view transactions')
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/transactions" aria-expanded="false">
+                            <a class="sidebar-link" href="/transactions" wire:navigate aria-expanded="false">
                                 <span>
                                     <i class="ti ti-businessplan"></i>
                                 </span>
@@ -42,7 +42,7 @@
 
                     {{-- @can('view setting') --}}
                     <li class="sidebar-item {{ Request::is('settings*') ? 'active selected' : '' }}">
-                        <a class="sidebar-link" href="{{ url('/settings/roles') }}" aria-expanded="false">
+                        <a class="sidebar-link" href="{{ url('/settings/roles') }}" wire:navigate aria-expanded="false">
                             <span>
                                 <i class="ti ti-settings"></i>
                             </span>
