@@ -126,14 +126,18 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('livewire:navigated', () => {
-            fetchUsers();
-            actionSearch('#searchUser', fetchUsers, '/api/settings/users');
-            pagination('#paginationUserLinks', fetchUsers, '#searchUser');
-            actionResetModal('#userModal', '#formUser', 'btn-add-user');
-            btnActionSave();
-            triggerBtnOnEnter('#formUser', '#btnSaveUser');
-        });
+        if (!window.userEventBound) {
+            window.userEventBound = true;
+            document.addEventListener('livewire:navigated', () => {
+                if (document.body.id !== 'settings-user') return;
+                fetchUsers();
+                actionSearch('#searchUser', fetchUsers, '/api/settings/users');
+                pagination('#paginationUserLinks', fetchUsers, '#searchUser');
+                actionResetModal('#userModal', '#formUser', 'btn-add-user');
+                btnActionSave();
+                triggerBtnOnEnter('#formUser', '#btnSaveUser');
+            });
+        }
 
 
         function fetchUsers(url = '/api/settings/users', searchQuery = '') {

@@ -52,7 +52,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -77,8 +77,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -98,25 +97,21 @@
 @endsection
 @push('scripts')
     <script data-navigate-track>
-        // document.addEventListener('DOMContentLoaded', function() {
-        //     fetchCategories();
-        //     actionResetModal('#categoryModal', '#formCategory', 'btn-add-category');
-        //     btnActionSave();
-        //     pagination('#paginationCategoryLinks',fetchCategories, '#searchCategory');
-        //     actionSearch('#searchCategory', fetchCategories, '/api/settings/categories');
-        //     triggerBtnOnEnter('#formCategory', '#btnSaveCategory');
-        // });
+        // One-time binding of the event
+        if (!window.categoryEventBound) {
+            window.categoryEventBound = true;
+            document.addEventListener('livewire:navigated', () => {
+                // only runs on category page
+                if (document.body.id !== 'settings-category') return;
+                fetchCategories();
+                actionResetModal('#categoryModal', '#formCategory', 'btn-add-category');
+                btnActionSave();
+                pagination('#paginationCategoryLinks', fetchCategories, '#searchCategory');
+                actionSearch('#searchCategory', fetchCategories, '/api/settings/categories');
+                triggerBtnOnEnter('#formCategory', '#btnSaveCategory');
+            });
+        }
 
-        document.addEventListener('livewire:navigated', () => {
-            fetchCategories();
-            actionResetModal('#categoryModal', '#formCategory', 'btn-add-category');
-            btnActionSave();
-            pagination('#paginationCategoryLinks',fetchCategories, '#searchCategory');
-            actionSearch('#searchCategory', fetchCategories, '/api/settings/categories');
-            triggerBtnOnEnter('#formCategory', '#btnSaveCategory');
-        });
-
-        
         $('#categoryModal').on('shown.bs.modal', function(e) {
             $('#category_name').focus();
         });
@@ -178,7 +173,6 @@
 
                     // Delete button click handler
                     $('.btn-delete-category').off('click').on('click', function(e) {
-                        console.log(`clicked`);
                         e.preventDefault();
                         const categoryId = $(this).data('id');
                         $('#deleteCategoryModal').modal('show');
@@ -203,17 +197,10 @@
                             headers: headers,
                             success: function(response) {
                                 if (response.status) {
-                                    console.log(`Category data fetched successfully:`, response
-                                        .data);
+
                                     $('#formCategory input[name="name"]').val(response.data
                                         .name);
-                                    $('#formCategory input[name="email"]').val(response.data
-                                        .email);
                                     $('#formCategory input[name="id"]').val(response.data.id);
-                                    console.log($('#formCategory select[name="role_id"]')
-                                        .html());
-                                    $('#formCategory select[name="role_id"]').val(response.data
-                                        .role[0].id);
                                 }
                             },
                             error: function(error) {
@@ -244,7 +231,7 @@
                 });
         };
 
-        function btnActionSave(){
+        function btnActionSave() {
             $('#btnSaveCategory').off().on('click', function(e) {
                 e.preventDefault();
                 const authToken = "{{ session('auth_token') }}";
@@ -285,7 +272,7 @@
             });
         };
 
-        function deleteCategory(props){
+        function deleteCategory(props) {
             $('#confirmDeleteCategoryBtn').off().on('click', function(e) {
                 e.preventDefault();
                 const authToken = "{{ session('auth_token') }}";

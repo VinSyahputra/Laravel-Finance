@@ -110,24 +110,28 @@
 
 @push('scripts')
     <script data-navigate-track>
-        // $(document).ready(function() {
-        //     fetchRoles();
-        //     btnActionSave();
-        //     actionResetModal('#roleModal', '#formRole', 'btn-add-role');
-        //     actionSearch('#searchRole', fetchRoles, '/api/settings/roles');
-        //     pagination('#paginationRoleLinks', fetchRoles, '#searchRole');
-        //     triggerBtnOnEnter('#formRole', '#btnSaveRole');
-        // });
-        document.addEventListener('livewire:navigated', () => {
-            fetchRoles();
-            btnActionSave();
-            actionResetModal('#roleModal', '#formRole', 'btn-add-role');
-            actionSearch('#searchRole', fetchRoles, '/api/settings/roles');
-            pagination('#paginationRoleLinks', fetchRoles, '#searchRole');
-            triggerBtnOnEnter('#formRole', '#btnSaveRole');
+        if (!window.roleEventBound) {
+            window.roleEventBound = true;
+            document.addEventListener('livewire:navigated', () => {
+                if (document.body.id !== 'settings-role') return;
+                fetchRoles();
+                btnActionSave();
+                actionResetModal('#roleModal', '#formRole', 'btn-add-role');
+                actionSearch('#searchRole', fetchRoles, '/api/settings/roles');
+                pagination('#paginationRoleLinks', fetchRoles, '#searchRole');
+                triggerBtnOnEnter('#formRole', '#btnSaveRole');
+            });
+        }
+        $('#roleModal').on('show.bs.modal', function() {
+            const roleId = $('#formRole input[name="id"]').val();
+            if (roleId) {
+                getDataPermissionsByRole(roleId).then(data => {
+                    getDataPermissions(data);
+                });
+            } else {
+                getDataPermissions();
+            }
         });
-
-
 
         function fetchRoles(url = '/api/settings/roles', searchQuery = '') {
             if (searchQuery) {
@@ -274,7 +278,6 @@
         };
 
         function getDataPermissions(parram = []) {
-            console.log(`parram`, parram);
             const authToken = "{{ session('auth_token') }}";
             let headers = {
                 'Authorization': `Bearer ${authToken}`,
@@ -297,7 +300,6 @@
                         checked: parramIds.includes(item.id)
                     })).sort((a, b) => a.id - b.id);
                     let html = '';
-                    console.log(`data`, data);
                     data.forEach(item => {
                         html += `
                             <div class="">
@@ -348,7 +350,7 @@
             });
         }
 
-        function deleteRole(props){
+        function deleteRole(props) {
             $('#confirmDeleteRoleBtn').off().on('click', function(e) {
                 e.preventDefault();
                 const authToken = "{{ session('auth_token') }}";
