@@ -6,6 +6,9 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
+use App\Livewire\Setting\Category;
+use App\Livewire\Setting\Role;
+use App\Livewire\Setting\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -39,11 +42,10 @@ Route::prefix('transactions')
 
 Route::prefix('settings')
     ->middleware(['auth', 'verified'])
-    ->controller(SettingController::class)
     ->group(function () {
-        Route::get('roles', 'getRoles');
-        Route::get('categories', 'getCategories');
-        Route::get('users', 'getUsers');
+        Route::get('/categories', Category::class)->name('settings.category');
+        Route::get('/roles', Role::class)->name('settings.role');
+        Route::get('/users', User::class)->name('settings.user');
     });
 
 
