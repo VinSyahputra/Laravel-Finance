@@ -99,7 +99,7 @@ function formatPrice(input) {
  * @param {string} formSelector - The selector for the form (e.g., '#formCategory').
  * @param {string} buttonSelector - The selector for the button to trigger (e.g., '#btnSaveCategory').
  */
-const triggerBtnOnEnter = (formSelector, buttonSelector) => {
+function triggerBtnOnEnter(formSelector, buttonSelector) {
     $(formSelector).on('keydown', function (e) {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -116,14 +116,14 @@ const triggerBtnOnEnter = (formSelector, buttonSelector) => {
  * @param {Function} fetchFunction - The function to call with the endpoint and search value
  * @param {string} endpoint - The API URL (e.g., '/api/settings/categories')
  */
-const actionSearch = (inputSelector, fetchFunction, endpoint) => {
+function actionSearch(inputSelector, fetchFunction, endpoint) {
     $(inputSelector).on('keyup', function () {
         const searchQuery = $(this).val();
         fetchFunction(endpoint, searchQuery);
     });
 };
 
-const pagination = (paginateLink, fetchFunction, searchSelector) => {
+function pagination(paginateLink, fetchFunction, searchSelector) {
     // Handle pagination link clicks
     $(paginateLink).on('click', '.page-link', function (e) {
         e.preventDefault();
@@ -135,7 +135,7 @@ const pagination = (paginateLink, fetchFunction, searchSelector) => {
     });
 }
 
-const actionResetModal = (modalId, formId, buttonClass) => {
+function actionResetModal(modalId, formId, buttonClass) {
     $(modalId).on('show.bs.modal', async function (e) {
 
         const triggerButton = $(e.relatedTarget);

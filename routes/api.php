@@ -34,7 +34,7 @@ Route::prefix('settings')
 
         Route::resource('roles', RoleController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-        Route::resource('permissions', PermissionController::class)->only(['index']);
+        Route::resource('permissions', PermissionController::class)->only(['index','show']);
 
         Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
