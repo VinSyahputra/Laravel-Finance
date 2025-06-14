@@ -144,7 +144,7 @@ function actionResetModal(modalId, formId, buttonClass) {
             $(`${formId} input[name="id"]`).val('');
         } else {
             try {
-                const categoryId = $(`${formId} input[name="id"]`).val('');
+                const id = $(`${formId} input[name="id"]`).val('');
             } catch (error) {
                 console.error('Error fetching categories:', error);
             }

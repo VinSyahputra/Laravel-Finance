@@ -12,6 +12,16 @@
 
     {{-- Livewire styles --}}
     @livewireStyles
+
+    <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}" data-navigate-track></script>
+    <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}" data-navigate-track></script>
+    <script src="{{ asset('assets/js/sidebarmenu.js') }}" data-navigate-track></script>
+    <script src="{{ asset('assets/js/app.min.js') }}" data-navigate-track></script>
+    <script src="{{ asset('assets/js/functions.js') }}" data-navigate-track></script>
+    <script src="{{ asset('assets/libs/simplebar/dist/simplebar.js') }}" data-navigate-track></script>
+    @stack('scripts')
+    {{-- Livewire scripts --}}
+    @livewireScripts
 </head>
 
 <body id="{{ str_replace('.', '-', Route::currentRouteName()) }}">
@@ -29,18 +39,9 @@
 
     </div>
 
-    <script src="{{ asset('assets/libs/jquery/dist/jquery.min.js') }}" data-navigate-track></script>
-    <script src="{{ asset('assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js') }}" data-navigate-track></script>
-    <script src="{{ asset('assets/js/sidebarmenu.js') }}" data-navigate-track></script>
-    <script src="{{ asset('assets/js/app.min.js') }}" data-navigate-track></script>
-    <script src="{{ asset('assets/js/functions.js') }}" data-navigate-track></script>
-    <script src="{{ asset('assets/libs/simplebar/dist/simplebar.js') }}" data-navigate-track></script>
-    @stack('scripts')
 
 
 
-    {{-- Livewire scripts --}}
-    @livewireScripts
 </body>
 
 </html>

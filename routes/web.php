@@ -6,6 +6,7 @@ use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TransactionController;
+use App\Livewire\Dashboard;
 use App\Livewire\Setting\Category;
 use App\Livewire\Setting\Role;
 use App\Livewire\Setting\User;
@@ -27,10 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('dashboard');
     });
 
-    // Show the dashboard for authenticated users
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 });
 
 Route::prefix('transactions')
