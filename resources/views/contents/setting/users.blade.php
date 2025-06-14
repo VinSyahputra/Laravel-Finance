@@ -53,7 +53,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

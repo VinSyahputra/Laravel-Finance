@@ -117,6 +117,11 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $roleId)
     {
+        
+        $validated = Validator::make($request->all(), RoleValidation::update());
+
+        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid', Response::HTTP_UNPROCESSABLE_ENTITY);
+
         $role = Role::findById($roleId);
         if (!$role) {
             return response()->json([
@@ -124,20 +129,6 @@ class RoleController extends Controller
                 "status" => "FAILED",
                 'message' => 'Not Found',
                 'errors'  => 'ID not found'
-            ], Response::HTTP_NOT_FOUND);
-        }
-
-        $validated = Validator::make($request->all(), RoleValidation::update());
-
-        if ($validated->fails()) return $this->responseError($validated->errors(), 'The given parameter was invalid', Response::HTTP_UNPROCESSABLE_ENTITY);
-
-        // Find the role
-        $role = Role::findById($request->roleId);
-
-        if (!$role) {
-            return response()->json([
-                'status' => Response::HTTP_NOT_FOUND,
-                'message' => 'Role not found',
             ], Response::HTTP_NOT_FOUND);
         }
 

@@ -51,7 +51,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -89,7 +89,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -116,22 +116,21 @@
                 if (document.body.id !== 'settings-role') return;
                 fetchRoles();
                 btnActionSave();
-                actionResetModal('#roleModal', '#formRole', 'btn-add-role');
                 actionSearch('#searchRole', fetchRoles, '/api/settings/roles');
                 pagination('#paginationRoleLinks', fetchRoles, '#searchRole');
                 triggerBtnOnEnter('#formRole', '#btnSaveRole');
+                $('#roleModal').on('show.bs.modal', function(e) {
+                    const triggerButton = $(e.relatedTarget);
+                    if (triggerButton.hasClass('btn-add-role')) {
+                        getDataPermissions();
+                        $('#formRole')[0].reset();
+                        $('#formRole input[name="id"]').val('');
+                        $('#formRole input[name="role_name"]').val('');
+                    }
+                });
             });
         }
-        $('#roleModal').on('show.bs.modal', function() {
-            const roleId = $('#formRole input[name="id"]').val();
-            if (roleId) {
-                getDataPermissionsByRole(roleId).then(data => {
-                    getDataPermissions(data);
-                });
-            } else {
-                getDataPermissions();
-            }
-        });
+
 
         function fetchRoles(url = '/api/settings/roles', searchQuery = '') {
             if (searchQuery) {
@@ -202,11 +201,41 @@
                     // Edit button click handler
                     $('.btn-update-role').off('click').on('click', function(e) {
                         e.preventDefault();
-                        const roleId = $(this).data('id');
-                        const roleName = $(this).data('name');
+                        const authToken = "{{ session('auth_token') }}";
+                        let headers = {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Accept': 'application/json'
+                        };
 
-                        $('#formRole input[name="id"]').val(roleId);
-                        $('#formRole input[name="role_name"]').val(roleName);
+                        const roleId = $(this).data('id');
+
+                        $.ajax({
+                            url: `/api/settings/roles/${roleId}`,
+                            type: 'GET',
+                            headers: headers,
+                            success: function(response) {
+                                if (response.status) {
+                                    $('#formRole input[name="role_name"]').val(response.data.role
+                                        .name);
+                                    $('#formRole input[name="id"]').val(response.data.role.id);
+
+                                    if (response.data.permissions) {
+                                        getDataPermissions(response.data.permissions);
+                                    } else {
+                                        getDataPermissionsByRole(roleId).then(permissions => {
+                                            getDataPermissions(permissions);
+                                        }).catch(error => {
+                                            console.error('Error fetching permissions:',
+                                                error);
+                                        });
+                                    }
+                                }
+                            },
+                            error: function(error) {
+                                showToast(error.responseJSON?.error || 'Failed to update role',
+                                    'danger');
+                            }
+                        });
 
                         $('#roleModal').modal('show');
                     });

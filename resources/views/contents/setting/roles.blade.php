@@ -52,7 +52,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -90,7 +90,7 @@
     </div>
 
      <!-- Delete Confirmation Modal -->
-     <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel" aria-hidden="true">
+     <div class="modal fade" id="deleteRoleModal" tabindex="-1" aria-labelledby="deleteRoleModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

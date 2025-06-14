@@ -126,7 +126,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -185,7 +185,7 @@
 
     <!-- Delete Confirmation Modal -->
     <div class="modal fade" id="deleteTransactionModal" tabindex="-1" aria-labelledby="deleteTransactionModalLabel"
-        aria-hidden="true">
+    >
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

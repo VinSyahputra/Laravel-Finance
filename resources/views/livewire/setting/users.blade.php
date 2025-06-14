@@ -52,7 +52,7 @@
     </div>
 
     <!-- Modal -->
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -105,7 +105,7 @@
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -199,7 +199,6 @@
 
                     // Delete button click handler
                     $('.btn-delete-user').off('click').on('click', function(e) {
-                        console.log(`clicked`);
                         e.preventDefault();
                         const userId = $(this).data('id');
                         $('#deleteUserModal').modal('show');
@@ -224,12 +223,10 @@
                             headers: headers,
                             success: function(response) {
                                 if (response.status) {
-                                    console.log(`User data fetched successfully:`, response
-                                        .data);
+
                                     $('#formUser input[name="name"]').val(response.data.name);
                                     $('#formUser input[name="email"]').val(response.data.email);
                                     $('#formUser input[name="id"]').val(response.data.id);
-                                    console.log($('#formUser select[name="role_id"]').html());
                                     $('#formUser select[name="role_id"]').val(response.data.role[0]
                                         .id);
                                 }

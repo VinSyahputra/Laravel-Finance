@@ -139,7 +139,7 @@
     {{-- <script src="{{ asset('assets/js/dashboard.js') }}"></script> --}}
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('livewire:navigated', function() {
             // fetchRecentTransactions();
         });
 
