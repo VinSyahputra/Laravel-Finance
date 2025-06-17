@@ -13,7 +13,7 @@ Route::get('categories', [CategoryController::class, 'index'])
     ->withoutMiddleware('auth:sanctum');
 
 
-Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy']);
+Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy'])->middleware('auth:sanctum');
 
 Route::prefix('analytics')
     ->middleware('auth:sanctum')

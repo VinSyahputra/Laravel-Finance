@@ -22,6 +22,7 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
+        $user_id = Auth::user()->id;
 
         $allowedSortFields = ['description', 'created_at', 'updated_at'];
 
@@ -37,14 +38,18 @@ class TransactionController extends Controller
                 $categoryId = $request->input('category_id');
                 return $query->where('category_id', $categoryId);
             })
+            ->when($request->input('type'), function ($query) use ($request) {
+                $type = $request->input('type');
+                return $query->where('type', $type);
+            })
             ->when($request->input('month'), function ($query) use ($request) {
                 return $query->whereMonth('date', $request->input('month'));
             })
             ->when($request->input('year'), function ($query) use ($request) {
                 return $query->whereYear('date', $request->input('year'));
             })
-            ->when($request->input('user_id'), function ($query) use ($request) {
-                return $query->where('input_by', $request->input('user_id'));
+            ->when($user_id, function ($query) use ($user_id) {
+                return $query->where('input_by', $user_id);
             })
             ->when($request->input('sort_by') && in_array($request->input('sort_by'), $allowedSortFields), function ($query) use ($request) {
                 $sortBy = $request->input('sort_by');
@@ -77,7 +82,7 @@ class TransactionController extends Controller
         $category = Transaction::Create([
             'date' => $request->date,
             'description' => $request->description,
-            'category_id' => $request->category,
+            'category_id' => $request->category_id,
             'type' => $request->type,
             'amount' => (int) str_replace('.', '', $request->amount),
             'input_by' => $request->user_id,
