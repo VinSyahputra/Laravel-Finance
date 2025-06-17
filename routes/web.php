@@ -10,6 +10,7 @@ use App\Livewire\Dashboard;
 use App\Livewire\Setting\Category;
 use App\Livewire\Setting\Role;
 use App\Livewire\Setting\User;
+use App\Livewire\Transaction;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -29,14 +30,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
+    Route::get('/transactions', Transaction::class)->name('transaction');
 });
 
-Route::prefix('transactions')
-    ->middleware(['auth', 'verified'])
-    ->controller(TransactionController::class)
-    ->group(function () {
-        Route::get('/', 'index');
-    });
+// Route::prefix('transactions')
+//     ->middleware(['auth', 'verified'])
+//     ->controller(TransactionController::class)
+//     ->group(function () {
+//         Route::get('/', 'index');
+//     });
 
 Route::prefix('settings')
     ->middleware(['auth', 'verified'])
