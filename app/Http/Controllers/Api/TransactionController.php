@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Exports\TransactionsExport;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\TransactionResource;
@@ -12,8 +13,11 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TransactionController extends Controller
 {
@@ -24,7 +28,7 @@ class TransactionController extends Controller
     {
         $user_id = Auth::user()->id;
 
-        $allowedSortFields = ['description', 'created_at', 'updated_at'];
+        $allowedSortFields = ['description', 'created_at', 'updated_at', 'amount', 'date'];
 
         $transactions = Transaction::with('category')
             ->when($request->input('search'), function ($query) use ($request) {
@@ -56,9 +60,9 @@ class TransactionController extends Controller
                 $sortDirection = $request->input('sort_direction', 'asc');
                 return $query->orderBy($sortBy, $sortDirection);
             }, function ($query) {
-                return $query->orderBy('date', 'asc');
+                return $query->orderBy('date', 'desc');
             })
-            ->paginate($request->input('per_page', 10));
+            ->paginate($request->input('per_page', 20));
 
         return TransactionResource::collection($transactions);
     }
@@ -206,5 +210,57 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return $this->responseError(null, 'Not found', Response::HTTP_NOT_FOUND);
         }
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file');
+        $data = array_map('str_getcsv', file($file));
+
+        // Process CSV rows (example)
+        foreach ($data as $index => $row) {
+            if ($index === 0) continue; // Skip header
+
+            Transaction::create([
+                'date' => $row[0],
+                'description' => $row[1],
+                'type' => $row[2],
+                'input_by' => $request->user_id,
+                'amount' => $row[3],
+            ]);
+        }
+
+        return response()->json(['message' => 'Transactions imported successfully.']);
+    }
+
+    public function export()
+    {
+        $export =  Excel::download(new TransactionsExport, 'users.xlsx');
+    }
+
+    public function download()
+    {
+        $headers = ['date', 'description', 'type', 'amount'];
+        $date = Date::now()->format('Y-m-d');
+        $firstRow = [$date, 'Salary', 'income', '50000'];
+        $secondRow = [$date, 'Bill', 'expense', '50000'];
+        $callback = function () use ($headers, $firstRow, $secondRow) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $headers); // Only header
+            fputcsv($file, $firstRow);    // Example row
+            fputcsv($file, $secondRow);    // Example row
+            fclose($file);
+        };
+
+        $filename = 'transactions_template.csv';
+
+        return new StreamedResponse($callback, 200, [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 }

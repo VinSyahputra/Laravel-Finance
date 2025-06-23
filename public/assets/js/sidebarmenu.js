@@ -31,7 +31,6 @@ function initSidebarActiveLinks() {
 
     // Clean up previous bindings
     $("#sidebarnav a").off("click").on("click", function (e) {
-        console.log(`clicked sidebar`);
 
         if (!$(this).hasClass("active")) {
             // Collapse all open

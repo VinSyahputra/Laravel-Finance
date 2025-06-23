@@ -66,6 +66,10 @@
                     </div>
                     <div class="card-body">
                         <div class="d-flex mb-2">
+                            <button class="btn btn-success btn-sm ms-auto" id="importTransaction"><i
+                                    class="ti ti-file-arrow-left"></i> Import</button>
+                        </div>
+                        <div class="d-flex mb-2">
                             <!-- Search Input -->
                             <input type="search" class="form-control me-2" id="searchTransaction"
                                 placeholder="Search transactions...">
@@ -92,12 +96,16 @@
                             </select>
 
                             <!-- Categories Filter -->
-                            <select class="form-select" id="filterType">
+                            <select class="form-select me-2" id="filterType">
+                                <option value="">Select Type</option>
                                 <option value="income">Income</option>
                                 <option value="expense">Expense</option>
                             </select>
 
                             <select class="form-select" id="filterCategory"></select>
+
+                            <input type="hidden" id="TransactionSortBy">
+                            <input type="hidden" id="TransactionSortDirection">
                         </div>
 
                         <div class="table-responsive">
@@ -105,10 +113,10 @@
                                 <thead>
                                     <tr>
                                         <th width="1%">No.</th>
-                                        <th>Date</th>
+                                        <th id="sortByDate">Date <i class="ti ti-arrows-down-up"></i></th>
                                         <th>Description</th>
                                         <th>Category</th>
-                                        <th>Amount</th>
+                                        <th id="sortByAmount">Amount <i class="ti ti-arrows-down-up"></i></th>
                                         <th>Type</th>
                                         <th width="1%" class="text-center">Action</th>
                                     </tr>
@@ -207,6 +215,35 @@
             </div>
         </div>
     </div>
+    <!-- Import Transaction Modal -->
+    <div class="modal fade" id="importTransactionModal" tabindex="-1" aria-labelledby="importTransactionModalLabel">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importTransactionModalLabel">Import Transactions</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="importTransactionForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="importFile" class="form-label">Select CSV File</label>
+                            <input type="hidden" name="user_id" value="{{ $user->id }}">
+                            <input type="file" class="form-control" id="importFile" name="file" accept=".csv">
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted">Please ensure the CSV file is formatted correctly.</small>
+                        </div>
+                        <button class="btn btn-success btn-sm" id="btnDownloadTemplate"><i class="ti ti-file"></i>
+                            download template</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"> Close</button>
+                    <button type="button" class="btn btn-primary" id="btnImportTransaction">Import</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
@@ -226,6 +263,7 @@
                 getCategories('transaction_category');
                 fetchTransactions();
                 btnActionSaveTransaction();
+                importTransactions();
 
                 $('#addTransaction').on('click', e => {
                     $('#formTransaction')[0].reset();
@@ -243,63 +281,97 @@
                         const type = $('#filterType').val();
                         const month = $('#filterMonth').val();
                         const year = $('#filterYear').val();
-
-                        fetchTransactions(url, searchQuery, categoryId, type, month, year);
+                        const currentSortBy = $('#TransactionSortBy').val();
+                        const currentSortDirection = $('#TransactionSortDirection').val();
+                        fetchTransactions(url, searchQuery, categoryId, type, month, year, currentSortBy,
+                            currentSortDirection);
                     }
                 });
-                $('#searchTransaction, #filterCategory, #filterType, #filterMonth, #filterYear').on('input change', function() {
+
+                $('#searchTransaction').off('input').on('input', function() {
+                    triggerSearch();
+                });
+
+                $('#filterCategory, #filterType, #filterMonth, #filterYear')
+                    .off('change')
+                    .on('change', function() {
+                        triggerSearch();
+                    });
+
+                function triggerSearch() {
                     const searchQuery = $('#searchTransaction').val();
                     const categoryId = $('#filterCategory').val();
                     const type = $('#filterType').val();
                     const month = $('#filterMonth').val();
                     const year = $('#filterYear').val();
+                    const currentSortBy = $('#TransactionSortBy').val();
+                    const currentSortDirection = $('#TransactionSortDirection').val();
 
-                    fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year);
+                    fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                        currentSortBy, currentSortDirection);
+                }
+
+                $('#importTransaction').off().on('click', function() {
+                    $('#importTransactionModal').modal('show');
+                });
+
+                $('#btnDownloadTemplate').off().on('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = `/api/transactions/download`;
+                });
+
+                $('#sortByAmount').off('click').on('click', function() {
+                    console.log(`clicked sort by amount`);
+                    const searchQuery = $('#searchTransaction').val();
+                    const categoryId = $('#filterCategory').val();
+                    const type = $('#filterType').val();
+                    const month = $('#filterMonth').val();
+                    const year = $('#filterYear').val();
+                    const currentSortBy = $('#TransactionSortBy').val();
+                    const currentSortDirection = $('#TransactionSortDirection').val();
+                    let sort_by = 'amount';
+                    let sort_direction = 'desc';
+                    if (currentSortBy === 'amount' && currentSortDirection === 'desc') {
+                        sort_direction = 'asc'; // Toggle to ascending
+                    } else {
+                        sort_direction = 'desc'; // Default to descending
+                    }
+                    $('#TransactionSortBy').val(sort_by);
+                    $('#TransactionSortDirection').val(sort_direction);
+
+                    fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                        sort_by, sort_direction);
+                });
+
+                $('#sortByDate').off('click').on('click', function() {
+                    console.log(`clicked sort by date`);
+                    const searchQuery = $('#searchTransaction').val();
+                    const categoryId = $('#filterCategory').val();
+                    const type = $('#filterType').val();
+                    const month = $('#filterMonth').val();
+                    const year = $('#filterYear').val();
+                    const currentSortBy = $('#TransactionSortBy').val();
+                    const currentSortDirection = $('#TransactionSortDirection').val();
+                    let sort_by = 'date';
+                    let sort_direction = 'desc';
+                    if (currentSortBy === 'date' && currentSortDirection === 'desc') {
+                        sort_direction = 'asc'; // Toggle to ascending
+                    } else {
+                        sort_direction = 'desc'; // Default to descending
+                    }
+                    $('#TransactionSortBy').val(sort_by);
+                    $('#TransactionSortDirection').val(sort_direction);
+
+                    fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                        sort_by, sort_direction);
                 });
             });
         }
-        // document.addEventListener('livewire:navigated', function() {
-        //     getDataExpenseInYear();
-        //     getDataIncomeInYear();
-        //     getDataExpenseInMonth();
-        //     getDataIncomeInMonth();
-        //     populateYearSelect();
-        //     getCategories('filterCategory');
-        //     getCategories('transaction_category');
-        //     fetchTransactions();
-        //     btnActionSaveTransaction();
-
-        //     $('#addTransaction').on('click', e => {
-        //         $('#formTransaction')[0].reset();
-        //         $('#transaction_id').val('');
-        //         $('#transactionModal').modal('show');
-        //     })
-
-        //     // Handle pagination link clicks
-        //     $('#paginationTransactionLinks').on('click', '.page-link', function(e) {
-        //         e.preventDefault();
-        //         const url = $(this).data('url');
-        //         if (url) {
-        //             const searchQuery = $('#searchTransaction').val();
-        //             const categoryId = $('#filterCategory').val();
-        //             const month = $('#filterMonth').val();
-        //             const year = $('#filterYear').val();
-
-        //             fetchTransactions(url, searchQuery, categoryId, month, year);
-        //         }
-        //     });
-        //     $('#searchTransaction, #filterCategory, #filterMonth, #filterYear').on('input change', function() {
-        //         const searchQuery = $('#searchTransaction').val(); // Search query
-        //         const categoryId = $('#filterCategory').val(); // Category ID
-        //         const month = $('#filterMonth').val(); // Selected month
-        //         const year = $('#filterYear').val(); // Selected year
-
-        //         fetchTransactions('api/transactions', searchQuery, categoryId, month, year);
-        //     });
-        // });
 
 
-        function fetchTransactions(url = 'api/transactions', searchQuery = '', categoryId = '', type='', month = '', year = '') {
+
+        function fetchTransactions(url = 'api/transactions', searchQuery = '', categoryId = '', type = '', month = '',
+            year = '', sort_by = 'date', sort_direction = 'desc') {
             // Append search query to the URL
             const params = new URLSearchParams();
 
@@ -318,6 +390,8 @@
             if (type) params.append('type', type); // Type filter
             if (month) params.append('month', month); // Month filter
             if (year) params.append('year', year); // Year filter
+            if (sort_by) params.append('sort_by', sort_by);
+            if (sort_direction) params.append('sort_direction', sort_direction);
 
             if (params.toString()) {
                 const querySymbol = url.includes('?') ? '&' : '?';
@@ -334,7 +408,7 @@
                     response.data.forEach((element, index) => {
                         htmlContent += `
                         <tr>    
-                          <td>${startIndex + index + 1}</td> <!-- Adjusted index -->
+                          <td>${startIndex + index + 1}</td>
                           <td>${moment(element?.date).format('DD/MMM/YYYY')}</td>
                           <td>${element?.description}</td>
                           <td>${element?.category?.name || 'No Category'}</td>
@@ -420,6 +494,54 @@
                     console.error('Error:', error);
                 });
         };
+
+        function importTransactions() {
+            $('#btnImportTransaction').off().on('click', function(e) {
+                e.preventDefault();
+
+                const formElement = $('#importTransactionForm')[0];
+                const formData = new FormData(formElement);
+
+                const authToken = "{{ session('auth_token') }}";
+
+                fetch('/api/transactions/import', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Import success:', data);
+                        
+                        const searchQuery = $('#searchTransaction').val();
+                        const categoryId = $('#filterCategory').val();
+                        const type = $('#filterType').val();
+                        const month = $('#filterMonth').val();
+                        const year = $('#filterYear').val();
+                        const currentSortBy = $('#TransactionSortBy').val();
+                        const currentSortDirection = $('#TransactionSortDirection').val();
+                        fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                            currentSortBy, currentSortDirection);
+                        getDataExpenseInYear();
+                        getDataIncomeInYear();
+                        getDataExpenseInMonth();
+                        getDataIncomeInMonth();
+                        $('#importTransactionForm')[0].reset();
+                        $('#importTransactionModal').modal('hide');
+                        showToast(
+                            `Transaction import successfully!`,
+                            'success');
+                    })
+                    .catch(error => {
+                        console.error('Import error:', error);
+                        showToast(error.responseJSON?.errors?.[Object.keys(error.responseJSON
+                            .errors)[0]][0] || 'Failed to save transaction', 'danger');
+                    });
+            });
+        }
 
 
         function populateYearSelect() {
@@ -722,7 +844,16 @@
                     headers: headers,
                     success: function(response) {
                         if (response.status) {
-                            fetchTransactions();
+                            
+                            const searchQuery = $('#searchTransaction').val();
+                            const categoryId = $('#filterCategory').val();
+                            const type = $('#filterType').val();
+                            const month = $('#filterMonth').val();
+                            const year = $('#filterYear').val();
+                            const currentSortBy = $('#TransactionSortBy').val();
+                            const currentSortDirection = $('#TransactionSortDirection').val();
+                            fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                            currentSortBy, currentSortDirection);
                             getDataExpenseInYear();
                             getDataIncomeInYear();
                             getDataExpenseInMonth();
@@ -773,7 +904,16 @@
                     headers: headers,
                     success: function(response) {
                         if (response.status) {
-                            fetchTransactions();
+                            
+                            const searchQuery = $('#searchTransaction').val();
+                            const categoryId = $('#filterCategory').val();
+                            const type = $('#filterType').val();
+                            const month = $('#filterMonth').val();
+                            const year = $('#filterYear').val();
+                            const currentSortBy = $('#TransactionSortBy').val();
+                            const currentSortDirection = $('#TransactionSortDirection').val();
+                            fetchTransactions('api/transactions', searchQuery, categoryId, type, month, year,
+                            currentSortBy, currentSortDirection);
                             getDataExpenseInYear();
                             getDataIncomeInYear();
                             getDataExpenseInMonth();

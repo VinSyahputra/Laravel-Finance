@@ -20,6 +20,9 @@ class User extends Component
 
     public function render()
     {
+        if (!$this->user->hasPermissionTo('view setting user')) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('livewire.setting.users');
     }
 }

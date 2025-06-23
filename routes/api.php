@@ -13,7 +13,17 @@ Route::get('categories', [CategoryController::class, 'index'])
     ->withoutMiddleware('auth:sanctum');
 
 
-Route::resource('transactions', TransactionController::class)->only(['index', 'store', 'update', 'destroy'])->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::resource('transactions', TransactionController::class)->only([
+        'index',
+        'store',
+        'update',
+        'destroy'
+    ]);
+});
+Route::post('transactions/import', [TransactionController::class, 'import']);
+// Route::post('transactions/export', [TransactionController::class, 'export']);
+Route::get('transactions/download', [TransactionController::class, 'download']);
 
 Route::prefix('analytics')
     ->middleware('auth:sanctum')
@@ -34,7 +44,7 @@ Route::prefix('settings')
 
         Route::resource('roles', RoleController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 
-        Route::resource('permissions', PermissionController::class)->only(['index','show']);
+        Route::resource('permissions', PermissionController::class)->only(['index', 'show']);
 
         Route::resource('users', UserController::class)->only(['index', 'show', 'store', 'update', 'destroy']);
 

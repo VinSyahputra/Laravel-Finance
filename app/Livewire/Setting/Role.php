@@ -19,6 +19,9 @@ class Role extends Component
 
     public function render()
     {
+        if (!$this->user->hasPermissionTo('view setting role')) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('livewire.setting.roles');
         // return view('livewire.setting.roles')->extends('layouts.app');
     }
