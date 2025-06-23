@@ -128,6 +128,13 @@
                         $('#formRole input[name="role_name"]').val('');
                     }
                 });
+
+                $('#btn_permission_select_all').on('click', function() {
+                    $('#containerPermission input[type="checkbox"]').prop('checked', true);
+                });
+                $('#btn_permission_unselect_all').on('click', function() {
+                    $('#containerPermission input[type="checkbox"]').prop('checked', false);
+                });
             });
         }
 
@@ -210,7 +217,7 @@
                         const roleId = $(this).data('id');
 
                         $.ajax({
-                            url: `/api/settings/roles/${roleId}`,
+                            url: `/api/settings/roles/${roleId}?page=1&per_page=200`,
                             type: 'GET',
                             headers: headers,
                             success: function(response) {
@@ -218,10 +225,13 @@
                                     $('#formRole input[name="role_name"]').val(response.data.role
                                         .name);
                                     $('#formRole input[name="id"]').val(response.data.role.id);
-
+                                    console.log(`response.data.permissions`, response.data
+                                        .permissions);
                                     if (response.data.permissions) {
+                                        console.log(`aa`);
                                         getDataPermissions(response.data.permissions);
                                     } else {
+                                        console.log(`bb`);
                                         getDataPermissionsByRole(roleId).then(permissions => {
                                             getDataPermissions(permissions);
                                         }).catch(error => {
@@ -258,12 +268,6 @@
                 });
         };
 
-        $('#btn_permission_select_all').on('click', function() {
-            $('#containerPermission input[type="checkbox"]').prop('checked', true);
-        });
-        $('#btn_permission_unselect_all').on('click', function() {
-            $('#containerPermission input[type="checkbox"]').prop('checked', false);
-        });
 
         function btnActionSave() {
             $('#btnSaveRole').off().on('click', function(e) {

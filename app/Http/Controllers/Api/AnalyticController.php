@@ -199,11 +199,13 @@ class AnalyticController extends Controller
 
         $dataLastYear = Transaction::where('input_by', $userId)
             ->whereYear('date', now()->subYear()->year)
+            ->whereMonth('date', now()->subMonth()->month)
             ->where('type', 'income')
             ->sum('amount'); // Get total amount from last year
 
         $dataCurrent = Transaction::where('input_by', $userId)
             ->whereYear('date', now()->year)
+            ->whereMonth('date', now()->month)
             ->where('type', 'income')
             ->sum('amount'); // Get total amount from this year
 

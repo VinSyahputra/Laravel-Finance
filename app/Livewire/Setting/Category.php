@@ -18,6 +18,9 @@ class Category extends Component
 
     public function render()
     {
+        if (!$this->user->hasPermissionTo('view setting category')) {
+            abort(403, 'Unauthorized action.');
+        }
         return view('livewire.setting.categories');
     }
 }

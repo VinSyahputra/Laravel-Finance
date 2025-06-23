@@ -40,7 +40,7 @@
                         </li>
                     @endcan
 
-                    {{-- @can('view setting') --}}
+                    @can('view setting role')
                     <li class="sidebar-item {{ Request::is('settings*') ? 'active selected' : '' }}">
                         <a class="sidebar-link" href="{{ url('/settings/roles') }}" wire:navigate aria-expanded="false">
                             <span>
@@ -49,7 +49,7 @@
                             <span class="hide-menu">Setting</span>
                         </a>
                     </li>
-                    {{-- @endcan --}}
+                    @endcan
                 </ul>
             </nav>
             <!-- End Sidebar navigation -->
